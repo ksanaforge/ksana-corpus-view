@@ -2,8 +2,9 @@ const React=require("react");
 const E=React.createElement;
 const PT=React.PropTypes;
 const CMView=require("./cmview");
-const {openCorpus}=require("ksana-corpus");
-const {decorate,decorateUserField}=require("./decorate");
+const openCorpus=require("ksana-corpus").openCorpus;
+const decorate=require("./decorate").decorate;
+const decorateUserField=require("./decorate").decorateUserField;
 const selectionActivity=require("./selectionactivity");
 const followLinkButton=require("./followlinkbutton");
 
@@ -24,77 +25,77 @@ const CorpusView=React.createClass({
 		extraKeys:PT.object,
 		fields:PT.object,
 	}
-	,getInitialState(){
+	,getInitialState:function(){
 		return {text:"",linebreaks:[],pagebreaks:[]};
 	}
-	,setupDecoratorActions(){
+	,setupDecoratorActions:function(){
 		//prepare actions for decorators
 		this.actions={};
-		for (let i in this.props) {
+		for (var i in this.props) {
 			if (typeof this.props[i]==="function") {
 				this.actions[i]=this.props[i];
 			}
 		}
 		this.actions.highlightAddress=this.highlightAddress;
 	}
-	,highlightAddress(address){
+	,highlightAddress:function(address){
 		const r=this.cor.parseRange(address);
-		const {start,end}=this.toLogicalRange(r.kRange);
-		this.highlight(start,end);
+		const k=this.toLogicalRange(r.kRange);;
+		this.highlight(k.start,k.end);
 	}
-	,clearLinkButtons(){
+	,clearLinkButtons:function(){
 		if (this.linkbuttons) {
 			this.linkbuttons.clear();
 			this.linkbuttons=null;
 		}
 	}
-	,clearHighlight(){
+	,clearHighlight:function(){
 		if(this.highlighmarker) {
 			this.highlighmarker.clear();		
 			this.highlighmarker=null;
 		}
 	}
-	,highlight(start,end){
+	,highlight:function(start,end){
 		this.clearHighlight();
 		this.highlighmarker=this.cm.markText(start,end,{className:"highlight",clearOnEnter:true});
 	}
-	,componentDidMount(){
+	,componentDidMount:function(){
 		if (!this.props.corpus) {
 			if(this.props.text) this.setState({text:this.props.text.join("\n")});
 			return;
 		}
 		this.loadtext();
 	}
-	,loadtext(props){
+	,loadtext:function(props){
 		props=props||this.props;
-		const {corpus,article,fields,rawlines,address,layout}=props;
-		this.cor=openCorpus(corpus);
+
+		this.cor=openCorpus(props.corpus);
 		this.markinview={};//fast check if mark already render, assuming no duplicate mark in same range
 		this.markdone={};
-		this.props.removeAllUserLinks&&this.props.removeAllUserLinks(corpus);
+		this.props.removeAllUserLinks&&this.props.removeAllUserLinks(props.corpus);
 		this.setupDecoratorActions();
 		decorateUserField.call(this,{},this.props.userfield);//this will unpaint all fields
 
-		this.layout(article,rawlines,address,layout);
+		this.layout(props.article,props.rawlines,props.address,props.layout);
 	}
-	,textReady(){
+	,textReady:function(){
 		this.scrollToAddress(this.props.address);
 		this.onViewportChange(this.cm);
 	}
-	,componentWillUnmount(){
+	,componentWillUnmount:function(){
 		if (!this.cm)return;
-		this.cm.getAllMarks().forEach((m)=>m.clear()); //might not need this
+		this.cm.getAllMarks().forEach(function(m){m.clear()}); //might not need this
 		this.cm.setValue("");
 	}
-	,shouldComponentUpdate(nextProps,nextState){
+	,shouldComponentUpdate:function(nextProps,nextState){
 		return (nextProps.corpus!==this.props.corpus
 			||nextProps.address!==this.props.address
 			||nextProps.layout!==this.props.layout
 			||nextState.text!==this.state.text);
 	}
-	,componentWillReceiveProps(nextProps){//cor changed
-		const {corpus,address,layout,article}=this.props;
-		if (nextProps.article.at!==article.at||nextProps.layout!==layout||nextProps.corpus!==corpus) {
+	,componentWillReceiveProps:function(nextProps){//cor changed
+		if (nextProps.article.at!==this.props.article.at||
+			nextProps.layout!==this.propslayout||nextProps.corpus!==this.props.corpus) {
 			this.loadtext(nextProps);
 			return;
 		}
@@ -112,14 +113,14 @@ const CorpusView=React.createClass({
 			this.scrollToAddress(nextProps.address);
 		}
 	}	
-	,clearSelection(){
+	,clearSelection:function(){
 		const cursor=this.cm.getCursor();
 		this.cm.doc.setSelection(cursor,cursor);
 	}
-	,toLogicalRange(range){
+	,toLogicalRange:function(range){
 		return this.cor.toLogicalRange(this.state.linebreaks,range,this.getRawLine);
 	}
-	,fromLogicalPos(linech){
+	,fromLogicalPos:function(linech){
 		if (!this.cor)return;
 		const firstline=this.cor.bookLineOf(this.props.article.start); //first of of the article
 		const text=this.cm.doc.getLine(linech.line);
@@ -127,16 +128,16 @@ const CorpusView=React.createClass({
 		if (typeof text==="undefined") return this.props.article.end;
 		return this.cor.fromLogicalPos(text,linech.ch,lb,firstline,this.getRawLine);
 	}
-	,getRawLine(line){
+	,getRawLine:function(line){
 		return this.props.rawlines[line];
 	}
-	,scrollToAddress(address){
+	,scrollToAddress:function(address){
 		const r=this.cor.toLogicalRange(this.state.linebreaks,address,this.getRawLine);
 		if (!r || r.start.line<0)return;
 		if (this.viewer) this.viewer.jumpToRange(r.start,r.end);
 		this.highlightAddress(address);
 	}
-	,layout(article,rawlines,address,playout){
+	,layout:function(article,rawlines,address,playout){
 		const cor=this.cor;
 		const layouttag="p";
 
@@ -145,15 +146,15 @@ const CorpusView=React.createClass({
 		}
 		var book=cor.bookOf(article.start);
 
-		const changetext=function({lines,pagebreaks,linebreaks}){
-			const text=lines.join("\n");
-			this.setState({linebreaks,pagebreaks,article,text}, this.textReady );
+		const changetext=function(o){
+			const text=o.lines.join("\n");
+			this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text}, this.textReady );
 		}
 
 		if (!playout) {
 			changetext.call(this, cor.layoutText(rawlines,article.start) );
 		} else {
-			cor.getBookField(layouttag,book,(book_p)=>{
+			cor.getBookField(layouttag,book,function(book_p){
 				if (!book_p) {
 					console.error(layouttag,book);
 					return;
@@ -163,7 +164,7 @@ const CorpusView=React.createClass({
 			});
 		}
 	}
-	,kRangeFromSel(cm,from,to){
+	,kRangeFromSel:function(cm,from,to){
 		if (!this.cor)return;
 		if (!from||!to)return 0;
 		const f=this.cor.fromLogicalPos.bind(this.cor);
@@ -172,7 +173,7 @@ const CorpusView=React.createClass({
 		const e=f(cm.doc.getLine(to.line),to.ch,this.state.linebreaks[to.line],firstline,this.getRawLine,true);
 		return this.cor.makeKRange(s,e);
 	}
-	,kRangeFromCursor(cm){
+	,kRangeFromCursor:function(cm){
 		if (!cm)return;
 		const sels=cm.listSelections();
 		if (!sels.length) return null;
@@ -183,40 +184,40 @@ const CorpusView=React.createClass({
 		}
 		return this.kRangeFromSel(cm,from,to);
 	}
-	,onCut(cm,evt){
+	,onCut:function(cm,evt){
 		/*1p178a0103-15 copy and paste incorrect*/
 		/* TODO,  address error crossing a page, has line 30 */
 		const krange=this.kRangeFromCursor(cm);
 
 		if (this.props.copyText) { //for excerpt copy
-			evt.target.value=this.props.copyText({cm,value:evt.target.value,krange,cor:this.cor});
+			evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});
 			evt.target.select();
 		} else { //default copy address
 			evt.target.value="@"+this.cor.stringify(krange)+';';
 			evt.target.select();//reselect the hidden textarea
 		}
 	}
-	,noSelection(cm){
+	,noSelection:function(cm){
 		const sels=cm.listSelections();	
 		if (sels.length!==1)false;
 		const s=sels[0].anchor,e=sels[0].head;
 		return s.line==e.line&&s.ch==e.ch;
 	}
-	,showDictHandle(cm){
+	,showDictHandle:function(cm){
 		this.dicthandle&&this.dicthandle.clear();
 		if (!cm.hasFocus())return;
 		var widget=document.createElement("span");
 		widget.className="dicthandle";
 		widget.innerHTML="佛光";
-		this.dicthandle=cm.setBookmark(cm.getCursor(),{widget,handleMouseEvents:true});
+		this.dicthandle=cm.setBookmark(cm.getCursor(),{widget:widget,handleMouseEvents:true});
 	}
-	,onBlur(cm){
+	,onBlur:function(cm){
 		this.dicthandle&&this.dicthandle.clear();
 	}
-	,onCursorActivity(cm){
+	,onCursorActivity:function(cm){
 		if (!this.cor) return;
 		clearTimeout(this.cursortimer);
-		this.cursortimer=setTimeout(()=>{
+		this.cursortimer=setTimeout(function(){
 			selectionActivity.call(this,cm);
 			const kpos=this.fromLogicalPos(cm.getCursor());
 
@@ -226,28 +227,28 @@ const CorpusView=React.createClass({
 			}
 			this.showDictHandle(cm);	
 			this.props.onCursorActivity&&this.props.onCursorActivity(cm,kpos);
-		},300);
+		}.bind(this),300);
 	}
-	,onViewportChange(cm,from,to){
+	,onViewportChange:function(cm,from,to){
 		cm=cm||this.cm;
 		if (!cm)return;
 		clearTimeout(this.viewporttimer);
-		this.viewporttimer=setTimeout(()=>{
+		this.viewporttimer=setTimeout(function(){
 			const vp=cm.getViewport();
 			const from=this.fromLogicalPos({line:vp.from,ch:0});
 			const to=this.fromLogicalPos({line:vp.to,ch:0});
 			decorate.call(this,from,to,this.props.userfield);
 			this.onViewport&&this.onViewport(cm,vp.from,vp.to,from,to); //extra params start and end kpos
 			this.addresschanged=true;
-		},50);
+		}.bind(this),50);
 	}
-	,setCM(cmviewer){
+	,setCM:function(cmviewer){
 		if (cmviewer) {
 			this.viewer=cmviewer;
 			this.cm=cmviewer.getCodeMirror();
 		}
 	}
-	,render(){
+	,render:function(){
 		if (!this.state.text) return E("div",{},"loading...");
 		const props=Object.assign({},this.props,
 			{ref:this.setCM,

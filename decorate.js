@@ -1,6 +1,7 @@
-const {makeMarkerId,clearWorkingLink}=require("./link");
+const clearWorkingLink=require("./link").clearWorkingLink;
+const makeMarkerId=require("./link").makeMarkerId;
 const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos){
-		let i=0;
+		var i=0;
 		while (i<pos.length) {
 			const range=this.cor.parseRange(pos[i]);
 			if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
@@ -29,25 +30,26 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos){
 			const r=this.toLogicalRange(p);
 			const markerid=makeMarkerId(fname,range);
 			const done=this.markdone[markerid];
-			this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,corpus:this.props.corpus,
-				kpos:range.start,krange:range,tabid:this.props.id,id:i,target,
-				multitarget,actions:this.actions,done});
+			this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,
+				corpus:this.props.corpus,
+				kpos:range.start,krange:range,tabid:this.props.id,id:i,target:target,
+				multitarget:multitarget,actions:this.actions,done:done});
 		}
 }
 
 const sortFields=function(fields){
 	const out=[];
-	for (let id in fields) {
+	for (var id in fields) {
 		const field=fields[id];
 		const r=this.cor.parseRange(field.from);
 		out.push([r.kRange, field]);
 	}
-	out.sort((a,b)=>a[0]-b[0]);
-	const pos=out.map((i)=>i[0]);
-	const value=out.map((i)=>i[1]);
-	const starts=out.map((i)=>i[2]);
+	out.sort(function(a,b){return a[0]-b[0]});
+	const pos=out.map(function(i){return i[0]});
+	const value=out.map(function(i){return i[1]});
+	const starts=out.map(function(i){return i[2]});
 
-	return {pos,value};
+	return {pos:pos,value:value};
 }
 const groupByDecorator=function(pos,value){
 	const out={};
@@ -61,7 +63,7 @@ const groupByDecorator=function(pos,value){
 }
 
 const removeDeleted=function(fields, oldfields){
-	for (let id in oldfields) {
+	for (var id in oldfields) {
 		const old=oldfields[id];
 		const markerid=makeMarkerId(old.decorator,old.kRange);
 		if (!fields[id]) {
@@ -76,20 +78,20 @@ const removeDeleted=function(fields, oldfields){
 }
 const decorateUserField=function(_fields, oldfields){
 	removeDeleted.call(this,_fields,oldfields);
-	const {pos,value}=sortFields.call(this,_fields);
-	for (let f in _fields) { //remove all worling link marker, force redraw
-		clearWorkingLink.call(this,f,true);
+	const ff=sortFields.call(this,_fields);
+	for (var _f in _fields) { //remove all worling link marker, force redraw
+		clearWorkingLink.call(this,_f,true);
 	}
 
-	const fields=groupByDecorator(pos,value);
-	for (let name in fields) {
+	const fields=groupByDecorator(ff.pos,ff.value);
+	for (var name in fields) {
 		const decorator=this.props.decorators[name];
 		decorateField.call(this,name,fields[name].pos,fields[name].value,decorator);
 	}
 
 }
 const decorate=function(fromkpos,tokpos){
-	for (let fname in this.props.fields) {
+	for (var fname in this.props.fields) {
 		if (!this.props.fields[fname]) continue;
 		const pos=this.props.fields[fname].pos, value=this.props.fields[fname].value;
 		const decorator=this.props.decorators[fname];
@@ -97,4 +99,4 @@ const decorate=function(fromkpos,tokpos){
 		decorateField.call(this,fname,pos,value,decorator,fromkpos,tokpos);
 	}
 }
-module.exports={decorate,decorateField,decorateUserField};
+module.exports={decorate:decorate,decorateField:decorateField,decorateUserField:decorateUserField};

@@ -3,7 +3,7 @@ const getCaretText=function(cm){ //get caretText for checking dictionary
 	var ch=from.ch;
 	if (ch>2) ch-=2; //include two char before
 	//should check punc backward
-	var caretText=cm.doc.getRange({line:from.line,ch},{line:from.line+1,ch:256});
+	var caretText=cm.doc.getRange({line:from.line,ch:ch},{line:from.line+1,ch:256});
 	caretText=caretText.replace(/\r?\n/g,"");
 	const m=caretText.match(/^[.？,。，！；「」『』—－：、（）｛｝【】《》]*(.*?)[.？,。，！；「」『』—－：、（）｛｝【】《》]/);
 	if (m){
@@ -16,7 +16,7 @@ const selectionActivity=function(cm){
 	if (sels.length>0){
 		const sel=sels[0];
 		var ranges=[];
-		for (let i=0;i<sels.length;i++) {
+		for (var i=0;i<sels.length;i++) {
 			ranges.push(this.kRangeFromSel(cm,sel.head,sel.anchor));
 		}
 
@@ -26,10 +26,10 @@ const selectionActivity=function(cm){
 		const r=this.cor.parseRange(cursorrange);
 		this.props.setSelection&&this.props.setSelection({
 				corpus:this.props.corpus,id:this.props.id,
-				caretText:getCaretText(cm),selectionText,
-				ranges, caretpos:r.start, caretposH:this.cor.stringify(r.start),
+				caretText:getCaretText(cm),selectionText:selectionText,
+				ranges:ranges, caretpos:r.start, caretposH:this.cor.stringify(r.start),
 				index:cm.indexFromPos(cursor),
-				cursor
+				cursor:cursor
 			});
 	}
 }

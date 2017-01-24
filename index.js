@@ -1,2 +1,2 @@
 const CorpusView=require("./corpusview");
-module.exports={CorpusView};
+module.exports={CorpusView:CorpusView};

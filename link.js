@@ -1,9 +1,10 @@
-const {openCorpus,trimArticleField}=require("ksana-corpus");
+const openCorpus=require("ksana-corpus").openCorpus;
+const trimArticleField=require("ksana-corpus").trimArticleField;
 
-const	getWorkingLinks=(workinglinks,prefix,article)=>{
+const	getWorkingLinks=function(workinglinks,prefix,article){
 	const fields=trimArticleField(workinglinks,article);
-	const value=fields.value.map( v=> prefix+"@"+v);
-	return {pos:fields.pos,value};
+	const value=fields.value.map( function(v){return  prefix+"@"+v});
+	return {pos:fields.pos,value:value};
 }
 const makeWLinkId=function(kpos,address){
 	return kpos.toString(36) +"_"+address.replace(/.+@/,"");
@@ -47,5 +48,5 @@ const clearWorkingLink=function(f,done){
 		delete this.markinview[markerid];
 	}	
 }
-module.exports={getWorkingLinks,makeWLinkId,parseWLinkId,
-	hasLinkAt,hasUserLinkAt,makeMarkerId,clearWorkingLink};
+module.exports={getWorkingLinks:getWorkingLinks,makeWLinkId:makeWLinkId,parseWLinkId:parseWLinkId,
+	hasLinkAt:hasLinkAt,hasUserLinkAt:hasUserLinkAt,makeMarkerId:makeMarkerId,clearWorkingLink:clearWorkingLink};

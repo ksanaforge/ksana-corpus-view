@@ -7,7 +7,7 @@ yinshun@57p1262.1301 has two sources
 const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
-const {hasUserLinkAt}=require("./link");
+const hasUserLinkAt=require("./link").hasUserLinkAt;
 const followLink=function(cm,kpos,fields,actions){
 	const links=hasUserLinkAt(kpos,fields);
 	
@@ -26,7 +26,7 @@ const followLink=function(cm,kpos,fields,actions){
 	var widget=document.createElement("span");
 	widget.className="followbuttongroup";
 	
-	for (let id in links) {
+	for (var id in links) {
 		var child=document.createElement("span");
 		child.onmousedown=onMouseDown;
 		child.onmouseover=onMouseOver;	
@@ -38,7 +38,7 @@ const followLink=function(cm,kpos,fields,actions){
 	}
 	
 	const insertat={line:cm.getCursor().line,ch:cm.getCursor().ch}
-	return cm.setBookmark(insertat,{widget,handleMouseEvents:true} );
+	return cm.setBookmark(insertat,{widget:widget,handleMouseEvents:true});
 }
 
 module.exports=followLink;

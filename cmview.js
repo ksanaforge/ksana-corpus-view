@@ -7,20 +7,20 @@ const CMView=React.createClass({
 	propTypes:{
 		text:PT.string.isRequired
 	}
-	,componentDidMount(){
+	,componentDidMount:function(){
 		this.loadText(this.props.text);
 	}
-	,shouldComponentUpdate(nextProps){
+	,shouldComponentUpdate:function(nextProps){
 		return nextProps.text!==this.props.text;
 	}
-	,componentWillReceiveProps(nextProps){
+	,componentWillReceiveProps:function(nextProps){
 		if (nextProps.text!==this.text) this.loadText(nextProps.text);
 	}
-	,loadText(newtext){
+	,loadText:function(newtext){
 		this.text=newtext;
 		this.cm.setValue(newtext);
 	}
-	,jumpToRange(from,to){
+	,jumpToRange:function(from,to){
 		const cm=this.cm;
 		const cursor=cm.getCursor();
 		/*
@@ -39,7 +39,7 @@ const CMView=React.createClass({
 		cm.scrollIntoView(coords);
 		//cm.focus();
 	}
-	,scrollToText(t){
+	,scrollToText:function(t){
 		var text=this.cm.getValue();
 		var at=text.indexOf(t);
 		if (at>-1) {
@@ -50,28 +50,28 @@ const CMView=React.createClass({
 			cm.scrollIntoView(pos);
 		}
 	}
-	,getAllMarks(){
+	,getAllMarks:function(){
 		return this.cm.getAllMarks();
 	}
-	,markText(){
+	,markText:function(){
 		return this.cm.doc.markText.apply(cm.doc,arguments);
 	}
-	,getLine(i){
+	,getLine:function(i){
 		return this.cm.getLine(i);
 	}
-	,onCopy(cm,evt){
+	,onCopy:function(cm,evt){
 		this.props.onCopy&&this.props.onCopy(cm,evt);
 	}
-	,onCut(cm,evt){
+	,onCut:function(cm,evt){
 		this.props.onCut&&this.props.onCut(cm,evt);
 	}
-	,getCodeMirror(){
+	,getCodeMirror:function(){
 		return this.cm;
 	}
-	,setCM(cm){
+	,setCM:function(cm){
 		if (cm) this.cm=cm.getCodeMirror();
 	}
-	,render(){
+	,render:function(){
 		return E("div",{},
 	  	E(CodeMirror,{ref:this.setCM,value:"",theme:this.props.theme,readOnly:true,
   	  onCursorActivity:this.props.onCursorActivity
