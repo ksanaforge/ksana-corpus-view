@@ -225,7 +225,7 @@ const CorpusView=React.createClass({
 			if (this.noSelection(cm)) {
 				this.linkbuttons=followLinkButton(cm,kpos,this.props.userfield,this.actions);
 			}
-			this.showDictHandle(cm);	
+			//this.showDictHandle(cm);	
 			this.props.onCursorActivity&&this.props.onCursorActivity(cm,kpos);
 		}.bind(this),300);
 	}

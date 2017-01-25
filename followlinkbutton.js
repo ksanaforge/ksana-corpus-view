@@ -8,6 +8,7 @@ const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
 const hasUserLinkAt=require("./link").hasUserLinkAt;
+const openCorpus=require("ksana-corpus").openCorpus;
 const followLink=function(cm,kpos,fields,actions){
 	const links=hasUserLinkAt(kpos,fields);
 	
@@ -31,8 +32,12 @@ const followLink=function(cm,kpos,fields,actions){
 		child.onmousedown=onMouseDown;
 		child.onmouseover=onMouseOver;	
 		child.className="followbutton"
+		const cor=openCorpus(links[id].corpus);
+		const shortname=cor.getGroupName(links[id].to,true);
 		child.target=links[id].corpus+"@"+links[id].to;
-		child.innerHTML=links[id].to.replace(/\..*/,"");//remove after page,make it shorter
+		var linklabel=links[id].to.replace(/\..*/,"");//remove after page,make it shorter;
+		if (shortname) linklabel=shortname+linklabel.replace(/.+p/,"");
+		child.innerHTML=linklabel;
 		child.id=id;
 		widget.appendChild(child);
 	}
