@@ -3,8 +3,11 @@ const E=React.createElement;
 const PT=React.PropTypes;
 const CMView=require("./cmview");
 const openCorpus=require("ksana-corpus").openCorpus;
+const getArticleHits=require("ksana-corpus-search").getArticleHits;
 const decorate=require("./decorate").decorate;
 const decorateUserField=require("./decorate").decorateUserField;
+const decoratePageStarts=require("./decorate").decoratePageStarts;
+const decorateHits=require("./decorate").decorateHits;
 const selectionActivity=require("./selectionactivity");
 const followLinkButton=require("./followlinkbutton");
 
@@ -24,6 +27,7 @@ const CorpusView=React.createClass({
 		updateArticleByAddress:PT.func,
 		extraKeys:PT.object,
 		fields:PT.object,
+		showPageStart:PT.bool
 	}
 	,getInitialState:function(){
 		return {text:"",linebreaks:[],pagebreaks:[]};
@@ -74,13 +78,20 @@ const CorpusView=React.createClass({
 		this.markdone={};
 		this.props.removeAllUserLinks&&this.props.removeAllUserLinks(props.corpus);
 		this.setupDecoratorActions();
+
 		decorateUserField.call(this,{},this.props.userfield);//this will unpaint all fields
 
 		this.layout(props.article,props.rawlines,props.address,props.layout);
 	}
 	,textReady:function(){
 		this.scrollToAddress(this.props.address);
-		this.onViewportChange(this.cm);
+		getArticleHits({cor:this.cor,lines:this.state.lines,linebreaks:this.state.linebreaks,
+			article:this.props.article,
+			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
+				decorateHits.call(this,hits);
+				this.onViewportChange(this.cm);
+				if (this.props.showPageStart) decoratePageStarts.call(this);
+		}.bind(this));
 	}
 	,componentWillUnmount:function(){
 		if (!this.cm)return;
@@ -148,7 +159,7 @@ const CorpusView=React.createClass({
 
 		const changetext=function(o){
 			const text=o.lines.join("\n");
-			this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text}, this.textReady );
+			this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
 		}
 
 		if (!playout) {

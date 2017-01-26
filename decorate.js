@@ -1,8 +1,9 @@
 const clearWorkingLink=require("./link").clearWorkingLink;
 const makeMarkerId=require("./link").makeMarkerId;
-const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos){
+const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
 		var i=0;
 		while (i<pos.length) {
+			const id=i;
 			const range=this.cor.parseRange(pos[i]);
 			if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
 				if (range.start<fromkpos || range.end>tokpos) {
@@ -30,9 +31,11 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos){
 			const r=this.toLogicalRange(p);
 			const markerid=makeMarkerId(fname,range);
 			const done=this.markdone[markerid];
+
 			this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,
 				corpus:this.props.corpus,
-				kpos:range.start,krange:range,tabid:this.props.id,id:i,target:target,
+				fields:fields,
+				kpos:range.start,krange:range,tabid:this.props.id,id:id,target:target,
 				multitarget:multitarget,actions:this.actions,done:done});
 		}
 }
@@ -96,7 +99,45 @@ const decorate=function(fromkpos,tokpos){
 		const pos=this.props.fields[fname].pos, value=this.props.fields[fname].value;
 		const decorator=this.props.decorators[fname];
 		if (!decorator) continue;
-		decorateField.call(this,fname,pos,value,decorator,fromkpos,tokpos);
+		decorateField.call(this,fname,pos,value,decorator,fromkpos,tokpos,this.props.fields);
 	}
 }
-module.exports={decorate:decorate,decorateField:decorateField,decorateUserField:decorateUserField};
+const decorateHits=function(phrasehits){
+	if (!this._hits) this._hits=[];
+	else {
+		this._hits.forEach(function(h){h.clear()});
+		this._hits=[];			
+	}
+
+	for (var i=0;i<phrasehits.length;i++) {
+		const hits=phrasehits[i].hits;
+		const lengths=phrasehits[i].lengths;
+		for (var j=0;j<hits.length;j++) {
+			const r=this.toLogicalRange(  this.cor.makeKRange(hits[j],hits[j]+ (lengths[j]||lengths)));
+			const marker=this.cm.markText(r.start,r.end,{className:'hl'+i});
+			this._hits.push(marker);
+		}
+	}
+}
+const decoratePageStarts=function(){
+	if (!this._pageStarts) this._pageStarts=[];
+	else {
+		this._pageStarts.forEach(function(pagestart){pagestart.clear()});
+		this._pageStarts=[];			
+	}
+	const regexpb=/p(\d+)/;
+	for (var i=0;i<this.state.pagebreaks.length;i++) {
+		const pb=this.state.pagebreaks[i];
+		const linech=this.toLogicalRange(pb);
+		const ele=document.createElement("div");
+		const label=document.createElement("span");
+		label.className="pblabel"
+		label.innerHTML=this.cor.stringify(pb).match(regexpb)[1];
+
+		ele.appendChild(label);
+		ele.className="pb";
+		this._pageStarts.push(this.cm.doc.addLineWidget(linech.start.line, ele,{above:true}));
+	}
+}
+module.exports={decorate:decorate,decorateField:decorateField,decorateUserField:decorateUserField
+,decoratePageStarts:decoratePageStarts,decorateHits:decorateHits};
