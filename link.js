@@ -1,5 +1,6 @@
 const openCorpus=require("ksana-corpus").openCorpus;
 const trimArticleField=require("ksana-corpus").trimArticleField;
+const bsearch=require("ksana-corpus/bsearch");
 
 const	getWorkingLinks=function(workinglinks,prefix,article){
 	const fields=trimArticleField(workinglinks,article);
@@ -23,7 +24,6 @@ const makeMarkerId=function(prefix,rangeobj){
 	}
 }
 const hasLinkAt=function(kpos,fields) {
-
 }
 const hasUserLinkAt=function(kpos,userfields){
 	const out={};
@@ -33,6 +33,7 @@ const hasUserLinkAt=function(kpos,userfields){
 	}
 	return out;
 }
+
 const clearWorkingLink=function(f,done){
 	if (!this.markinview ||!this.markdone)return;
 	const p=parseWLinkId(f);
@@ -48,5 +49,19 @@ const clearWorkingLink=function(f,done){
 		delete this.markinview[markerid];
 	}	
 }
+
+const hasHitAt=function(kpos,articlehits){
+	for (var i=0;i<articlehits.length;i++) {
+		const phrase=articlehits[i];
+		const hits=articlehits[i].hits;
+		const at=bsearch(hits,kpos+1 ,true)-1;
+		if (hits[at]-1<kpos && hits[at]+(phrase.lengths[at]||phrase.lengths)>=kpos) {
+			return {phrase:i,nhit:at};
+		}
+	}
+	return null;
+}
+
 module.exports={getWorkingLinks:getWorkingLinks,makeWLinkId:makeWLinkId,parseWLinkId:parseWLinkId,
-	hasLinkAt:hasLinkAt,hasUserLinkAt:hasUserLinkAt,makeMarkerId:makeMarkerId,clearWorkingLink:clearWorkingLink};
+	hasLinkAt:hasLinkAt,hasUserLinkAt:hasUserLinkAt,makeMarkerId:makeMarkerId,clearWorkingLink:clearWorkingLink,
+hasHitAt:hasHitAt};

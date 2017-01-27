@@ -10,6 +10,7 @@ const decoratePageStarts=require("./decorate").decoratePageStarts;
 const decorateHits=require("./decorate").decorateHits;
 const selectionActivity=require("./selectionactivity");
 const followLinkButton=require("./followlinkbutton");
+const hitButton=require("./hitbutton");
 
 const CorpusView=React.createClass({
 	propTypes:{
@@ -53,6 +54,12 @@ const CorpusView=React.createClass({
 			this.linkbuttons=null;
 		}
 	}
+	,clearHitButtons:function(){
+		if (this.hitbuttons) {
+			this.hitbuttons.clear();
+			this.hitbuttons=null;
+		}
+	}
 	,clearHighlight:function(){
 		if(this.highlighmarker) {
 			this.highlighmarker.clear();		
@@ -89,6 +96,7 @@ const CorpusView=React.createClass({
 			article:this.props.article,
 			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
 				decorateHits.call(this,hits);
+				this.articleHits=hits;
 				this.onViewportChange(this.cm);
 				if (this.props.showPageStart) decoratePageStarts.call(this);
 		}.bind(this));
@@ -117,6 +125,7 @@ const CorpusView=React.createClass({
 			//decorateUserField might clearWorking Link , call viewportchange to repaint
 			this.onViewportChange();
 			this.clearLinkButtons();
+			this.clearHitButtons();
 		}
 		//if (this.cm && nextProps.active)this.cm.focus();
 
@@ -233,8 +242,10 @@ const CorpusView=React.createClass({
 			const kpos=this.fromLogicalPos(cm.getCursor());
 
 			this.clearLinkButtons();
+			this.clearHitButtons();
 			if (this.noSelection(cm)) {
 				this.linkbuttons=followLinkButton(cm,kpos,this.props.userfield,this.actions);
+				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
 			//this.showDictHandle(cm);	
 			this.props.onCursorActivity&&this.props.onCursorActivity(cm,kpos);
