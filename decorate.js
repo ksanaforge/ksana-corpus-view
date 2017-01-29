@@ -103,6 +103,7 @@ const decorate=function(fromkpos,tokpos){
 	}
 }
 const decorateHits=function(phrasehits){
+	if (!phrasehits)return;
 	if (!this._hits) this._hits=[];
 	else {
 		this._hits.forEach(function(h){h.clear()});
