@@ -98,7 +98,12 @@ const CorpusView=React.createClass({
 				decorateHits.call(this,hits);
 				this.articleHits=hits;
 				this.onViewportChange(this.cm);
-				if (this.props.showPageStart) decoratePageStarts.call(this);
+
+				if (this.props.showPageStart) {
+					setTimeout(function(){
+						decoratePageStarts.call(this);
+					}.bind(this),100);
+				}
 		}.bind(this));
 	}
 	,componentWillUnmount:function(){

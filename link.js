@@ -51,6 +51,7 @@ const clearWorkingLink=function(f,done){
 }
 
 const hasHitAt=function(kpos,articlehits){
+	if (!articlehits)return null;
 	for (var i=0;i<articlehits.length;i++) {
 		const phrase=articlehits[i];
 		const hits=articlehits[i].hits;
