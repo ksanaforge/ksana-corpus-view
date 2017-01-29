@@ -6,26 +6,31 @@ const _=require("ksana-localization")._;
 const openCorpus=require("ksana-corpus").openCorpus;
 
 const HitButtons=React.createClass({
-	prev(){
+	prev:function(){
 		const phrasehits=this.props.articlehits[this.props.phrase].hits;
 		const n=this.props.nhit-1;
 		if (n>=0) {
 			this.props.updateArticleByAddress(phrasehits[n]);
 		}
 	},
-	next(){
+	canNext:function(){
 		const phrasehits=this.props.articlehits[this.props.phrase].hits;
 		const n=this.props.nhit+1;
-		if (n<phrasehits.length) {
+		return (n<phrasehits.length) 	;
+	},
+	next:function(){
+		const phrasehits=this.props.articlehits[this.props.phrase].hits;
+		const n=this.props.nhit+1;
+		if (this.canNext()){
 			this.props.updateArticleByAddress(phrasehits[n]);
 		}
 	},
 	render:function(){
 		return E("div",{},
-			E("span",{className:"hitbutton",onClick:this.prev},_("Prev Hit")),
+			this.props.nhit?E("span",{className:"hitbutton",onClick:this.prev},_("Prev Hit")):null,
 			" ",
-			E("span",{className:"hitbutton",onClick:this.next},_("Next Hit"))
-		);
+			this.canNext()?E("span",{className:"hitbutton",onClick:this.next},_("Next Hit")):null
+		)
 	}
 })
 
