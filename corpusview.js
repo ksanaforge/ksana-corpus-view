@@ -134,9 +134,9 @@ const CorpusView=React.createClass({
 		}
 		//if (this.cm && nextProps.active)this.cm.focus();
 
-		//if (this.props.address!==nextProps.address ) {
-		//	this.scrollToAddress(nextProps.address);
-		//}
+		if (this.props.address!==nextProps.address ) { //need by updateArticleByAddress
+			this.scrollToAddress(nextProps.address);
+		}
 	}	
 	,clearSelection:function(){
 		const cursor=this.cm.getCursor();
