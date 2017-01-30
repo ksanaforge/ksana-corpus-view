@@ -151,7 +151,7 @@ const CorpusView=React.createClass({
 			if (!this.inViewPort(r.start.line)) {
 				this.scrollToAddress(nextProps.address);
 			} else {
-				this.cm.setCursor(r.start);
+				if (this.noSelection(this.cm)) this.cm.setCursor(r.start);
 			}
 		}
 	}	
