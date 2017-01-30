@@ -1,17 +1,18 @@
 const getCaretText=function(cm){ //get caretText for checking dictionary
 	const from=cm.getCursor();
 	var ch=from.ch;
-	if (ch>2) ch-=2; //include two char before
+	//if (ch>1) ch-=1; //include two char before
 	//should check punc backward
 	var caretText=cm.doc.getRange({line:from.line,ch:ch},{line:from.line+1,ch:256});
 	caretText=caretText.replace(/\r?\n/g,"");
-	const m=caretText.match(/^[.？,。，！；「」『』—－：、（）｛｝【】《》]*(.*?)[.？,。，！；「」『』—－：、（）｛｝【】《》]/);
+	const m=caretText.match(/^[.？,。，！；「」『』—－：、（）〈〉｛｝【】《》]*(.*?)[.？,。，！；「」『』—－：、（）｛｝【】〈〉《》]/);
 	if (m){
 		caretText=m[1];
 	}
 	return caretText;
 }
 const selectionActivity=function(cm){
+
 	const sels=cm.listSelections();	
 	if (sels.length>0){
 		const sel=sels[0];
