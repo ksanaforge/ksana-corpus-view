@@ -92,17 +92,20 @@ const CorpusView=React.createClass({
 	}
 	,textReady:function(){
 		this.scrollToAddress(this.props.address);
+
 		getArticleHits({cor:this.cor,lines:this.state.lines,linebreaks:this.state.linebreaks,
 			article:this.props.article,
 			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
+
 				decorateHits.call(this,hits);
+
 				this.articleHits=hits;
 				this.onViewportChange(this.cm);
 
 				if (this.props.showPageStart) {
 					setTimeout(function(){
 						decoratePageStarts.call(this);
-					}.bind(this),100);
+					}.bind(this),10);
 				}
 		}.bind(this));
 	}
@@ -117,7 +120,13 @@ const CorpusView=React.createClass({
 			||nextProps.layout!==this.props.layout
 			||nextState.text!==this.state.text);
 	}
+	,inViewPort(line){
+		const vp=this.cm.getViewport();
+		const from=vp.from,to=vp.to;
+		return (line>=from && line<=vp.to)
+	}
 	,componentWillReceiveProps:function(nextProps){//cor changed
+
 		if (nextProps.article.at!==this.props.article.at||
 			nextProps.layout!==this.propslayout||nextProps.corpus!==this.props.corpus) {
 			this.loadtext(nextProps);
@@ -135,7 +144,15 @@ const CorpusView=React.createClass({
 		//if (this.cm && nextProps.active)this.cm.focus();
 
 		if (this.props.address!==nextProps.address ) { //need by updateArticleByAddress
-			this.scrollToAddress(nextProps.address);
+
+			const r=this.cor.toLogicalRange(this.state.linebreaks,nextProps.address,this.getRawLine);
+			if (!r || r.start.line<0)return;
+
+			if (!this.inViewPort(r.start.line)) {
+				this.scrollToAddress(nextProps.address);
+			} else {
+				this.cm.setCursor(r.start);
+			}
 		}
 	}	
 	,clearSelection:function(){
