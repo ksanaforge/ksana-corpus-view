@@ -120,13 +120,12 @@ const CorpusView=React.createClass({
 			||nextProps.layout!==this.props.layout
 			||nextState.text!==this.state.text);
 	}
-	,inViewPort(line){
+	,inViewPort:function(line){
 		const vp=this.cm.getViewport();
 		const from=vp.from,to=vp.to;
-		return (line>=from && line<=vp.to)
+		return (line>=from && line<=vp.to);
 	}
 	,componentWillReceiveProps:function(nextProps){//cor changed
-
 		if (nextProps.article.at!==this.props.article.at||
 			nextProps.layout!==this.propslayout||nextProps.corpus!==this.props.corpus) {
 			this.loadtext(nextProps);
