@@ -101,7 +101,7 @@ const CorpusView=React.createClass({
 				this.articleHits=hits;
 				this.onViewportChange(this.cm);
 
-				if (this.props.showPageStart) {
+				if (this.props.showPageStart && !this.props.layout) {
 					setTimeout(function(){
 						decoratePageStarts.call(this);
 					}.bind(this),10);
@@ -127,7 +127,7 @@ const CorpusView=React.createClass({
 	}
 	,componentWillReceiveProps:function(nextProps){//cor changed
 		if (nextProps.article.at!==this.props.article.at||
-			nextProps.layout!==this.propslayout||nextProps.corpus!==this.props.corpus) {
+			nextProps.layout!==this.props.layout||nextProps.corpus!==this.props.corpus) {
 			this.loadtext(nextProps);
 			return;
 		}
@@ -143,7 +143,6 @@ const CorpusView=React.createClass({
 		//if (this.cm && nextProps.active)this.cm.focus();
 
 		if (this.props.address!==nextProps.address ) { //need by updateArticleByAddress
-
 			const r=this.cor.toLogicalRange(this.state.linebreaks,nextProps.address,this.getRawLine);
 			if (!r || r.start.line<0)return;
 
@@ -178,7 +177,14 @@ const CorpusView=React.createClass({
 	,scrollToAddress:function(address){
 		const r=this.cor.toLogicalRange(this.state.linebreaks,address,this.getRawLine);
 		if (!r || r.start.line<0)return;
-		if (this.viewer) this.viewer.jumpToRange(r.start,r.end);
+		if (this.viewer) {
+			if (r.start==r.end) {
+				const rr=this.cor.toLogicalPos(this.state.linebreaks,address,this.getRawLine,true);
+				this.viewer.jumpToRange(rr,rr);
+			} else {
+				this.viewer.jumpToRange(r.start,r.end);
+			}
+		}
 		this.highlightAddress(address);
 	}
 	,layout:function(article,rawlines,address,playout){
@@ -194,7 +200,6 @@ const CorpusView=React.createClass({
 			const text=o.lines.join("\n");
 			this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
 		}
-
 		if (!playout) {
 			changetext.call(this, cor.layoutText(rawlines,article.start) );
 		} else {
@@ -205,7 +210,7 @@ const CorpusView=React.createClass({
 				}
 				const p=cor.trimField(book_p,article.start,article.end);
 				changetext.call(this, cor.layoutText(rawlines,article.start,p.pos) );
-			});
+			}.bind(this));
 		}
 	}
 	,kRangeFromSel:function(cm,from,to){
@@ -266,8 +271,8 @@ const CorpusView=React.createClass({
 		if (!this.cor) return;
 		clearTimeout(this.cursortimer);
 		this.cursortimer=setTimeout(function(){
-			selectionActivity.call(this,cm);
 			const kpos=this.fromLogicalPos(cm.getCursor());
+			selectionActivity.call(this,cm);
 
 			this.clearLinkButtons();
 			this.clearHitButtons();

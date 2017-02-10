@@ -29,7 +29,7 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
 			}
 			var r;
 			if (this.cor.isRange(p)){
-				r=this.cor.isRange(p)
+				r=this.toLogicalRange(p);
 			} else {
 				rr=this.toLogicalPos(p);
 				r={start:rr,end:rr};
