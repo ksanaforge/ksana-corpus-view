@@ -85,6 +85,13 @@ const removeDeleted=function(fields, oldfields){
 		}
 	}
 }
+const getDecorator=function(fieldname) { //might suffix with @
+	var decoratorname=fieldname;
+	const at=fieldname.indexOf("@");
+	if (at>0) decoratorname=decoratorname.substr(0,at);
+
+	return this.props.decorators[decoratorname];
+}
 const decorateUserField=function(_fields, oldfields){
 	removeDeleted.call(this,_fields,oldfields);
 	const ff=sortFields.call(this,_fields);
@@ -94,18 +101,20 @@ const decorateUserField=function(_fields, oldfields){
 
 	const fields=groupByDecorator(ff.pos,ff.value);
 	for (var name in fields) {
-		const decorator=this.props.decorators[name];
-		decorateField.call(this,name,fields[name].pos,fields[name].value,decorator);
+		decoratorname=name;
+		const at=name.indexOf("@");
+		if (at>0) decoratorname=decoratorname.substr(0,at);
+		const decorator=getDecorator.call(this,name);;
+		decorator&&decorateField.call(this,name,fields[name].pos,fields[name].value,decorator);
 	}
 
 }
 const decorate=function(fromkpos,tokpos){
 	for (var fname in this.props.fields) {
 		if (!this.props.fields[fname]) continue;
-		const pos=this.props.fields[fname].pos, value=this.props.fields[fname].value;
-		const decorator=this.props.decorators[fname];
-		if (!decorator) continue;
-		decorateField.call(this,fname,pos,value,decorator,fromkpos,tokpos,this.props.fields);
+		const pos=this.props.fields[fname].pos, value=this.props.fields[fname].value;		
+		const decorator=getDecorator.call(this,fname);
+		decorator&&decorateField.call(this,fname,pos,value,decorator,fromkpos,tokpos,this.props.fields);
 	}
 }
 const decorateHits=function(phrasehits){
@@ -132,13 +141,14 @@ const decoratePageStarts=function(){
 		this._pageStarts.forEach(function(pagestart){pagestart.clear()});
 		this._pageStarts=[];			
 	}
-	const regexpb=/p(\d+)/;
+	const regexpb=/p(\d+[a-z]?)/;
 	for (var i=0;i<this.state.pagebreaks.length;i++) {
 		const pb=this.state.pagebreaks[i];
 		const linech=this.toLogicalRange(pb);
 		const ele=document.createElement("div");
 		const label=document.createElement("span");
 		label.className="pblabel"
+
 		label.innerHTML=this.cor.stringify(pb).match(regexpb)[1];
 
 		ele.appendChild(label);
