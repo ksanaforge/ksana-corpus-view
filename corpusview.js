@@ -92,7 +92,6 @@ const CorpusView=React.createClass({
 	}
 	,textReady:function(){
 		this.scrollToAddress(this.props.address);
-
 		getArticleHits({cor:this.cor,lines:this.state.lines,linebreaks:this.state.linebreaks,
 			article:this.props.article,
 			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
@@ -118,6 +117,7 @@ const CorpusView=React.createClass({
 		return (nextProps.corpus!==this.props.corpus
 			||nextProps.address!==this.props.address
 			||nextProps.layout!==this.props.layout
+			||nextProps.fields!==this.props.fields
 			||nextState.text!==this.state.text);
 	}
 	,inViewPort:function(line){
@@ -231,7 +231,11 @@ const CorpusView=React.createClass({
 		const krange=this.kRangeFromCursor(cm);
 
 		if (this.props.copyText) { //for excerpt copy
-			evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});
+			if (evt.target.value.length<2) {
+				evt.target.value=this.cor.stringify(this.cor.parseRange(krange).start);
+			} else {
+				evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});				
+			}
 			evt.target.select();
 		} else { //default copy address
 			evt.target.value="@"+this.cor.stringify(krange)+';';
