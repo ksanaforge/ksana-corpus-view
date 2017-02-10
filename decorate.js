@@ -27,8 +27,14 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
 				multitarget=true;
 				i++;
 			}
+			var r;
+			if (this.cor.isRange(p)){
+				r=this.cor.isRange(p)
+			} else {
+				rr=this.toLogicalPos(p);
+				r={start:rr,end:rr};
+			}
 
-			const r=this.toLogicalRange(p);
 			const markerid=makeMarkerId(fname,range);
 			const done=this.markdone[markerid];
 

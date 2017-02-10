@@ -161,6 +161,9 @@ const CorpusView=React.createClass({
 	,toLogicalRange:function(range){
 		return this.cor.toLogicalRange(this.state.linebreaks,range,this.getRawLine);
 	}
+	,toLogicalPos:function(kpos,beforepunc){
+		return this.cor.toLogicalPos(this.state.linebreaks,kpos,this.getRawLine,this.cor.meta.removePunc,beforepunc);
+	}
 	,fromLogicalPos:function(linech){
 		if (!this.cor)return;
 		const firstline=this.cor.bookLineOf(this.props.article.start); //first of of the article
