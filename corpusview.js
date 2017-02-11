@@ -109,6 +109,7 @@ const CorpusView=React.createClass({
 		}.bind(this));
 	}
 	,componentWillUnmount:function(){
+		this._unmounted=true;
 		if (!this.cm)return;
 		this.cm.getAllMarks().forEach(function(m){m.clear()}); //might not need this
 		this.cm.setValue("");
@@ -271,6 +272,7 @@ const CorpusView=React.createClass({
 		if (!this.cor) return;
 		clearTimeout(this.cursortimer);
 		this.cursortimer=setTimeout(function(){
+			if (this._unmounted)return;
 			const kpos=this.fromLogicalPos(cm.getCursor());
 			selectionActivity.call(this,cm);
 
