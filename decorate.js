@@ -57,7 +57,6 @@ const sortFields=function(fields){
 	out.sort(function(a,b){return a[0]-b[0]});
 	const pos=out.map(function(i){return i[0]});
 	const value=out.map(function(i){return i[1]});
-	const starts=out.map(function(i){return i[2]});
 
 	return {pos:pos,value:value};
 }

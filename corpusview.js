@@ -29,6 +29,7 @@ const CorpusView=React.createClass({
 		updateArticleByAddress:PT.func,
 		extraKeys:PT.object,
 		fields:PT.object,
+		userfield:PT.object,
 		showPageStart:PT.bool
 	}
 	,getInitialState:function(){
@@ -134,9 +135,8 @@ const CorpusView=React.createClass({
 			return;
 		}
 
-		if (nextProps.userfield && nextProps.userfield !== this.props.userfield
-		||nextProps.activeUserfield!==this.props.activeUserfield) { //user field should have id
-			decorateUserField.call(this,nextProps.userfield,this.props.userfield,nextProps.activeUserfield);
+		if (nextProps.userfield && nextProps.userfield !== this.props.userfield) { //user field should have id
+			decorateUserField.call(this,nextProps.userfield,this.props.userfield);
 			//decorateUserField might clearWorking Link , call viewportchange to repaint
 			this.onViewportChange();
 			this.clearLinkButtons();
@@ -295,7 +295,8 @@ const CorpusView=React.createClass({
 			const vp=cm.getViewport();
 			const from=this.fromLogicalPos({line:vp.from,ch:0});
 			const to=this.fromLogicalPos({line:vp.to,ch:0});
-			decorate.call(this,from,to,this.props.userfield);
+
+			decorate.call(this,from,to);
 			this.onViewport&&this.onViewport(cm,vp.from,vp.to,from,to); //extra params start and end kpos
 			this.addresschanged=true;
 		}.bind(this),50);
