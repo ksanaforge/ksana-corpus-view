@@ -40,6 +40,7 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
 
 			this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,
 				corpus:this.props.corpus,
+				field:fname,
 				fields:fields,
 				kpos:range.start,krange:range,tabid:this.props.id,id:id,target:target,
 				multitarget:multitarget,actions:this.actions,done:done});

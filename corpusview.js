@@ -14,7 +14,8 @@ const hitButton=require("./hitbutton");
 
 const CorpusView=React.createClass({
 	propTypes:{
-		corpus:PT.string.isRequired,
+		corpus:PT.string,
+		cor:PT.object,
 		address:PT.oneOfType([PT.string.isRequired,PT.number.isRequired]),
 		rawlines:PT.array.isRequired,
 		article:PT.object.isRequired,
@@ -71,7 +72,7 @@ const CorpusView=React.createClass({
 		this.highlighmarker=this.cm.markText(start,end,{className:"highlight",clearOnEnter:true});
 	}
 	,componentDidMount:function(){
-		if (!this.props.corpus) {
+		if (!this.props.corpus && !this.props.cor) {
 			if(this.props.text) this.setState({text:this.props.text.join("\n")});
 			return;
 		}
@@ -80,7 +81,7 @@ const CorpusView=React.createClass({
 	,loadtext:function(props){
 		props=props||this.props;
 
-		this.cor=openCorpus(props.corpus);
+		this.cor=this.props.cor?this.props.cor:openCorpus(props.corpus);
 		this.markinview={};//fast check if mark already render, assuming no duplicate mark in same range
 		this.markdone={};
 		this.props.removeAllUserLinks&&this.props.removeAllUserLinks(props.corpus);
@@ -115,7 +116,7 @@ const CorpusView=React.createClass({
 		this.cm.setValue("");
 	}
 	,shouldComponentUpdate:function(nextProps,nextState){
-		return (nextProps.corpus!==this.props.corpus
+		return (  nextProps.corpus!==this.props.corpus||nextProps.cor!==this.props.cor
 			||nextProps.address!==this.props.address
 			||nextProps.layout!==this.props.layout
 			||nextProps.fields!==this.props.fields
@@ -128,7 +129,7 @@ const CorpusView=React.createClass({
 	}
 	,componentWillReceiveProps:function(nextProps){//cor changed
 		if (nextProps.article.at!==this.props.article.at||
-			nextProps.layout!==this.props.layout||nextProps.corpus!==this.props.corpus) {
+			nextProps.layout!==this.props.layout||nextProps.corpus!==this.props.corpus||nextProps.cor!==this.props.cor) {
 			this.loadtext(nextProps);
 			return;
 		}
