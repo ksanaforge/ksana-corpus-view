@@ -7,10 +7,22 @@ yinshun@57p1262.1301 has two sources
 const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
-const hasUserLinkAt=require("./link").hasUserLinkAt;
-const openCorpus=require("ksana-corpus").openCorpus;
-const followLink=function(cm,kpos,fields,actions){
-	const links=hasUserLinkAt(kpos,fields);
+
+const getLinkLabel=function(link,corpora){
+	var linklabel=link.to;
+	if (!corpora) return  linklabel;
+	const cor=corpora[link.corpus]; //not open yet
+	if (!cor) return link.corpus;
+
+	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to,true):"";
+	if (typeof linklabel=="number") {
+		linklabel=link.corpus+"@"+linklabel;
+	}
+	linklabel=linklabel.replace(/\..*/,"");//remove after page,make it shorter;
+	if (shortname) linklabel=shortname+"p"+linklabel.replace(/.+p/,"");
+	return linklabel;
+}
+const followLink=function(cm,links,actions,corpora){
 	
 	if (!Object.keys(links).length) return;
 
@@ -32,11 +44,10 @@ const followLink=function(cm,kpos,fields,actions){
 		child.onmousedown=onMouseDown;
 		child.onmouseover=onMouseOver;	
 		child.className="followbutton"
-		const cor=openCorpus(links[id].corpus);
-		const shortname=cor.getGroupName(links[id].to,true);
+
+		const linklabel=getLinkLabel(links[id],corpora);
+
 		child.target=links[id].corpus+"@"+links[id].to;
-		var linklabel=links[id].to.replace(/\..*/,"");//remove after page,make it shorter;
-		if (shortname) linklabel=shortname+linklabel.replace(/.+p/,"");
 		child.innerHTML=linklabel;
 		child.id=id;
 		widget.appendChild(child);

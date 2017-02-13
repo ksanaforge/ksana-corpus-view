@@ -23,7 +23,28 @@ const makeMarkerId=function(prefix,rangeobj){
 		return prefix+rangeobj.kRange;
 	}
 }
-const hasLinkAt=function(kpos,fields) {
+const hasLinkAt=function(cor,kpos,fields,corpora) {
+	const out=[],targetcorpus="";
+	for (var name in fields) {
+		const field=fields[name];
+		if (!field)continue;
+
+		const targetcorpus=name.replace(/.*@/,"");
+		const targetcor=corpora[targetcorpus];
+		if (!cor.isRange(field.pos[0])) continue;
+
+		for (var i=0;i<field.pos.length;i++) {
+			const r=cor.parseRange(field.pos[i]);
+			if (kpos>=r.start && kpos<=r.end) {
+				var to=field.value[i];
+				if (targetcor && typeof to=="number") {
+					to=targetcor.stringify(to);
+				}
+				out.push({id:i,corpus:targetcorpus,from:field.pos[i],to:to});
+			}
+		}
+	}
+	return out;
 }
 const hasUserLinkAt=function(kpos,userfields){
 	const out={};

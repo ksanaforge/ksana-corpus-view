@@ -11,11 +11,14 @@ const decorateHits=require("./decorate").decorateHits;
 const selectionActivity=require("./selectionactivity");
 const followLinkButton=require("./followlinkbutton");
 const hitButton=require("./hitbutton");
+const hasUserLinkAt=require("./link").hasUserLinkAt;
+const hasLinkAt=require("./link").hasLinkAt;
 
 const CorpusView=React.createClass({
 	propTypes:{
 		corpus:PT.string,
 		cor:PT.object,
+		corpora:PT.object,//open corpus 
 		address:PT.oneOfType([PT.string.isRequired,PT.number.isRequired]),
 		rawlines:PT.array.isRequired,
 		article:PT.object.isRequired,
@@ -51,9 +54,13 @@ const CorpusView=React.createClass({
 		this.highlight(k.start,k.end);
 	}
 	,clearLinkButtons:function(){
-		if (this.linkbuttons) {
-			this.linkbuttons.clear();
-			this.linkbuttons=null;
+		if (this.userlinkbuttons) {
+			this.userlinkbuttons.clear();
+			this.userlinkbuttons=null;
+		}
+		if (this.multilinkbuttons) {
+			this.multilinkbuttons.clear();
+			this.multilinkbuttons=null;
 		}
 	}
 	,clearHitButtons:function(){
@@ -279,8 +286,14 @@ const CorpusView=React.createClass({
 
 			this.clearLinkButtons();
 			this.clearHitButtons();
+			this.clearHighlight();
 			if (this.noSelection(cm)) {
-				this.linkbuttons=followLinkButton(cm,kpos,this.props.userfield,this.actions);
+				const userlinks=hasUserLinkAt(kpos,this.props.userfield);
+				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
+
+				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora);				
+				this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
+
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
 			//this.showDictHandle(cm);	
