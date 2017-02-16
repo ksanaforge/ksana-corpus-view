@@ -7,12 +7,18 @@ yinshun@57p1262.1301 has two sources
 const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
-
+const {stringifyRange}=require("ksana-corpus");
 const getLinkLabel=function(link,corpora){
 	var linklabel=link.to;
 	if (!corpora) return  linklabel;
 	const cor=corpora[link.corpus]; //not open yet
-	if (!cor) return link.corpus;
+	if (!cor) {
+		if (typeof linklabel=="number") {
+			const l=linklabel=stringifyRange(linklabel,link.corpus);
+			if (l) return l;
+		}
+		return link.corpus;
+	}
 
 	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to,true):"";
 	if (typeof linklabel=="number") {
