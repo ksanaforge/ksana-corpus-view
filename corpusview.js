@@ -50,7 +50,7 @@ const CorpusView=React.createClass({
 	}
 	,highlightAddress:function(address){
 		const r=this.cor.parseRange(address);
-		const k=this.toLogicalRange(r.kRange);;
+		const k=this.toLogicalRange(r.range);;
 		this.highlight(k.start,k.end);
 	}
 	,clearLinkButtons:function(){
@@ -229,7 +229,7 @@ const CorpusView=React.createClass({
 		const firstline=this.cor.bookLineOf(this.props.article.start); //first of of the article
 		const s=f(cm.doc.getLine(from.line),from.ch,this.state.linebreaks[from.line],firstline,this.getRawLine,true);
 		const e=f(cm.doc.getLine(to.line),to.ch,this.state.linebreaks[to.line],firstline,this.getRawLine,true);
-		return this.cor.makeKRange(s,e);
+		return this.cor.makeRange(s,e);
 	}
 	,kRangeFromCursor:function(cm){
 		if (!cm)return;

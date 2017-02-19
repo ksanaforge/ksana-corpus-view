@@ -20,7 +20,7 @@ const makeMarkerId=function(prefix,rangeobj){
 	if (rangeobj.start==rangeobj.end) {
 		return prefix+rangeobj.start;
 	} else {
-		return prefix+rangeobj.kRange;
+		return prefix+rangeobj.range;
 	}
 }
 const hasLinkAt=function(cor,kpos,fields,corpora) {
@@ -30,6 +30,7 @@ const hasLinkAt=function(cor,kpos,fields,corpora) {
 		if (!field)continue;
 
 		const targetcorpus=name.replace(/.*@/,"");
+		if (targetcorpus==name) continue;
 		const targetcor=corpora[targetcorpus];
 		if (!cor.isRange(field.pos[0])) continue;
 

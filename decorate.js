@@ -52,7 +52,7 @@ const sortFields=function(fields){
 	for (var id in fields) {
 		const field=fields[id];
 		const r=this.cor.parseRange(field.from);
-		out.push([r.kRange, field]);
+		out.push([r.range, field]);
 	}
 	out.sort(function(a,b){return a[0]-b[0]});
 	const pos=out.map(function(i){return i[0]});
@@ -74,7 +74,7 @@ const groupByDecorator=function(pos,value){
 const removeDeleted=function(fields, oldfields){
 	for (var id in oldfields) {
 		const old=oldfields[id];
-		const markerid=makeMarkerId(old.decorator,old.kRange);
+		const markerid=makeMarkerId(old.decorator,old.range);
 		if (!fields[id]) {
 			const m=this.markinview[markerid];
 			if (m){
@@ -129,7 +129,7 @@ const decorateHits=function(phrasehits){
 		const hits=phrasehits[i].hits;
 		const lengths=phrasehits[i].lengths;
 		for (var j=0;j<hits.length;j++) {
-			const r=this.toLogicalRange(  this.cor.makeKRange(hits[j],hits[j]+ (lengths[j]||lengths)));
+			const r=this.toLogicalRange(  this.cor.makeRange(hits[j],hits[j]+ (lengths[j]||lengths)));
 			const marker=this.cm.markText(r.start,r.end,{className:'hl'+i});
 			this._hits.push(marker);
 		}
