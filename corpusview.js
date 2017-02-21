@@ -100,7 +100,6 @@ const CorpusView=React.createClass({
 		this.layout(props.article,props.rawlines,props.address,props.layout);
 	}
 	,textReady:function(){
-		this.scrollToAddress(this.props.address);
 		getArticleHits({cor:this.cor,lines:this.state.lines,linebreaks:this.state.linebreaks,
 			article:this.props.article,
 			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
@@ -115,6 +114,8 @@ const CorpusView=React.createClass({
 						decoratePageStarts.call(this);
 					}.bind(this),10);
 				}
+				this.scrollToAddress(this.props.address);
+
 		}.bind(this));
 	}
 	,componentWillUnmount:function(){
@@ -124,16 +125,29 @@ const CorpusView=React.createClass({
 		this.cm.setValue("");
 	}
 	,shouldComponentUpdate:function(nextProps,nextState){
-		return (  nextProps.corpus!==this.props.corpus||nextProps.cor!==this.props.cor
+		const scu=(  nextProps.corpus!==this.props.corpus||nextProps.cor!==this.props.cor
 			||nextProps.address!==this.props.address
 			||nextProps.layout!==this.props.layout
 			||nextProps.fields!==this.props.fields
 			||nextState.text!==this.state.text);
+		return scu;
 	}
 	,inViewPort:function(line){
 		const vp=this.cm.getViewport();
 		const from=vp.from,to=vp.to;
 		return (line>=from && line<=vp.to);
+	}
+	,removeDeleteFields:function(fields){
+		const newmarkinview={};
+		for (var id in this.markinview){
+			const type=id.match(/(.*?)_/)[1];
+			if (!fields[type]) {
+				this.markinview[id].clear();
+			} else {
+				newmarkinview[id]=this.markinview[id];
+			}
+		};
+		this.markinview=newmarkinview;
 	}
 	,componentWillReceiveProps:function(nextProps){//cor changed
 		if (nextProps.article.at!==this.props.article.at||
@@ -148,6 +162,11 @@ const CorpusView=React.createClass({
 			this.onViewportChange();
 			this.clearLinkButtons();
 			this.clearHitButtons();
+		}
+
+		if (nextProps.fields!==this.props.fields) {
+			this.removeDeleteFields(nextProps.fields);
+			this.onViewportChange();			
 		}
 		//if (this.cm && nextProps.active)this.cm.focus();
 

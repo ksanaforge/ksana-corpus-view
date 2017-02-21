@@ -22,22 +22,13 @@ const CMView=React.createClass({
 	}
 	,jumpToRange:function(from,to){
 		const cm=this.cm;
-		const cursor=cm.getCursor();
-		/*
-		if ((from.ch!==to.ch||from.line!==to.line)) {
-			const s=cm.indexFromPos(from);const e=cm.indexFromPos(to);
-			this.marktext&&this.marktext.clear&&this.marktext.clear();
-			if (Math.abs(s-e)>1){
-				this.marktext=cm.markText(from,to,{className:"gotomarker",clearOnEnter:true});					
-			}
-		}
-		*/
-		cm.scrollIntoView({line:0,ch:0});
+		cm.scrollIntoView({line:cm.lineCount()-1,ch:0});
 		cm.setCursor(from);
-		var coords=cm.cursorCoords(from,"local");
-		coords.bottom+=cm.getScrollInfo().clientHeight*2/3;
-		cm.scrollIntoView(coords);
-		//cm.focus();
+		setTimeout(function(){
+			if (from.line<cm.lineCount()){
+				cm.scrollIntoView(from);
+			}
+		},300);//wait for decorator
 	}
 	,scrollToText:function(t){
 		var text=this.cm.getValue();

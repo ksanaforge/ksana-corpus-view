@@ -107,9 +107,9 @@ const decorateUserField=function(_fields, oldfields){
 		const decorator=getDecorator.call(this,name);;
 		decorator&&decorateField.call(this,name,fields[name].pos,fields[name].value,decorator);
 	}
-
 }
-const decorate=function(fromkpos,tokpos){
+
+const decorate=function(fromkpos,tokpos,oldfields){
 	for (var fname in this.props.fields) {
 		if (!this.props.fields[fname]) continue;
 		const pos=this.props.fields[fname].pos, value=this.props.fields[fname].value;		

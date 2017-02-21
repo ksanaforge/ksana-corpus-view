@@ -15,12 +15,12 @@ const parseWLinkId=function(wlinkid){
 }
 const makeMarkerId=function(prefix,rangeobj){
 	if (typeof rangeobj=="number") {
-		return prefix+rangeobj;
+		return prefix+"_"+rangeobj;
 	}
 	if (rangeobj.start==rangeobj.end) {
-		return prefix+rangeobj.start;
+		return prefix+"_"+rangeobj.start;
 	} else {
-		return prefix+rangeobj.range;
+		return prefix+"_"+rangeobj.range;
 	}
 }
 const hasLinkAt=function(cor,kpos,fields,corpora) {
