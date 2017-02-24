@@ -17,13 +17,13 @@ const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
 				continue;
 			}
 
-			const p=pos[i],v=value[i];
-			var target=value[i], multitarget=false;
+			const p=pos[i],v=value?value[i]:"";
+			var target=v, multitarget=false;
 			i++;
 
 			while (i<pos.length && this.cor.parseRange(pos[i]).start==range.start) {
 				if (!multitarget) target=[target];
-				target.push(value[i]);
+				target.push(value?value[i]:i);
 				multitarget=true;
 				i++;
 			}

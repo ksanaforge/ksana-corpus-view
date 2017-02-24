@@ -23,7 +23,7 @@ const CorpusView=React.createClass({
 		rawlines:PT.array.isRequired,
 		article:PT.object.isRequired,
 		theme:PT.string,
-		layout:PT.bool, //layout with p?
+		layout:PT.array,
 		active:PT.bool, //in active tab
 		onCursorActivity:PT.func,
 		onViewport:PT.func,
@@ -109,7 +109,7 @@ const CorpusView=React.createClass({
 				this.articleHits=hits;
 				this.onViewportChange(this.cm);
 
-				if (this.props.showPageStart && !this.props.layout) {
+				if (this.props.showPageStart) {
 					setTimeout(function(){
 						decoratePageStarts.call(this);
 					}.bind(this),10);
@@ -217,29 +217,12 @@ const CorpusView=React.createClass({
 	}
 	,layout:function(article,rawlines,address,playout){
 		const cor=this.cor;
-		const layouttag="p";
-
 		if (!address){ //scroll to the selection after layout
 			address=this.kRangeFromCursor(this.cm);
 		}
-		var book=cor.bookOf(article.start);
-
-		const changetext=function(o){
-			const text=o.lines.join("\n");
-			this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
-		}
-		if (!playout) {
-			changetext.call(this, cor.layoutText(rawlines,article.start) );
-		} else {
-			cor.getBookField(layouttag,book,function(book_p){
-				if (!book_p) {
-					console.error(layouttag,book);
-					return;
-				}
-				const p=cor.trimField(book_p,article.start,article.end);
-				changetext.call(this, cor.layoutText(rawlines,article.start,p.pos) );
-			}.bind(this));
-		}
+		const o=cor.layoutText(rawlines,article.start,playout)
+		const text=o.lines.join("\n");
+		this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
 	}
 	,kRangeFromSel:function(cm,from,to){
 		if (!this.cor)return;

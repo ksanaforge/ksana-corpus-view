@@ -26,6 +26,7 @@ const CMView=React.createClass({
 		cm.setCursor(from);
 		setTimeout(function(){
 			if (from.line<cm.lineCount()){
+				if (from.line>3) from.line-=3;
 				cm.scrollIntoView(from);
 			}
 		},300);//wait for decorator
