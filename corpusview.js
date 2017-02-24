@@ -208,12 +208,11 @@ const CorpusView=React.createClass({
 		if (this.viewer) {
 			if (r.start==r.end) {
 				const rr=this.cor.toLogicalPos(this.state.linebreaks,address,this.getRawLine,true);
-				this.viewer.jumpToRange(rr,rr);
+				this.viewer.jumpToRange(rr,rr,this.highlightAddress.bind(this,address));
 			} else {
-				this.viewer.jumpToRange(r.start,r.end);
+				this.viewer.jumpToRange(r.start,r.end,this.highlightAddress.bind(this,address));
 			}
 		}
-		this.highlightAddress(address);
 	}
 	,layout:function(article,rawlines,address,playout){
 		const cor=this.cor;

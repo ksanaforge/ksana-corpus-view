@@ -20,7 +20,7 @@ const CMView=React.createClass({
 		this.text=newtext;
 		this.cm.setValue(newtext);
 	}
-	,jumpToRange:function(from,to){
+	,jumpToRange:function(from,to,cb){
 		const cm=this.cm;
 		cm.scrollIntoView({line:cm.lineCount()-1,ch:0});
 		cm.setCursor(from);
@@ -29,6 +29,7 @@ const CMView=React.createClass({
 				if (from.line>3) from.line-=3;
 				cm.scrollIntoView(from);
 			}
+			cb&&cb();
 		},300);//wait for decorator
 	}
 	,scrollToText:function(t){
