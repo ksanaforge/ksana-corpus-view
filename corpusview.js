@@ -142,7 +142,7 @@ const CorpusView=React.createClass({
 		for (var id in this.markinview){
 			const type=id.match(/(.*?)_/)[1];
 			if (!fields[type]) {
-				this.markinview[id].clear();
+				this.markinview[id]&&this.markinview[id].clear();
 			} else {
 				newmarkinview[id]=this.markinview[id];
 			}
