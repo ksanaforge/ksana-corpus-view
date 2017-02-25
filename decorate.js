@@ -1,7 +1,31 @@
 const clearWorkingLink=require("./link").clearWorkingLink;
 const makeMarkerId=require("./link").makeMarkerId;
-const decorateField=function(fname,pos,value,decorator,fromkpos,tokpos,fields){
+
+
+//for field with same starting position,
+//the short one comes later, so that it will not be overwrite by longer span
+const reOrderField=function(cor,pos,value){
+	var arr=[];
+	for (var i=0;i<pos.length;i++) {
+		arr.push([pos[i],value?value[i]:null]);
+	}
+	arr.sort(function(a,b){
+		const r1=cor.parseRange(a[0]);
+		const r2=cor.parseRange(b[0]);
+		if (r1.start!==r2.start) return r1.start-r2.start;//start has higher priority
+
+		return r2.end-r1.end;
+	});
+	var out={pos:[],value:[]};
+	for (var i=0;i<arr.length;i++) {
+		out.pos.push(arr[i][0]);
+		out.value.push(arr[i][1]);
+	}
+	return out;
+}
+const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields){
 		var i=0;
+		const {pos,value}=reOrderField(this.cor,_pos,_value);
 		while (i<pos.length) {
 			const id=i;
 			const range=this.cor.parseRange(pos[i]);
