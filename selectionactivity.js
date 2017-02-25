@@ -1,9 +1,13 @@
-const getCaretText=function(cm){ //get caretText for checking dictionary
-	const from=cm.getCursor();
-	var ch=from.ch;
+const getCaretText=function(cm,sel){ //get caretText for checking dictionary
+	var line=sel.head.line,ch=sel.head.ch;
+	//get caret from left of selection
+	if (sel.head.line>sel.anchor.line ||
+		 (sel.head.line==sel.anchor.line && sel.anchor.ch<sel.head.ch)) {
+		line=sel.anchor.line,ch=sel.anchor.ch;
+	}
 	//if (ch>1) ch-=1; //include two char before
 	//should check punc backward
-	var caretText=cm.doc.getRange({line:from.line,ch:ch},{line:from.line+1,ch:256});
+	var caretText=cm.doc.getRange({line:line,ch:ch},{line:line+1,ch:256});
 	caretText=caretText.replace(/\r?\n/g,"");
 	const m=caretText.match(/^[.？,。，！；「」『』—－：、（）〈〉｛｝【】《》]*(.*?)[.？,。，！；「」『』—－：、（）｛｝【】〈〉《》]/);
 	if (m){
@@ -27,7 +31,7 @@ const selectionActivity=function(cm){
 		const r=this.cor.parseRange(cursorrange);
 		this.props.setSelection&&this.props.setSelection({
 				corpus:this.props.corpus,id:this.props.id,
-				caretText:getCaretText(cm),selectionText:selectionText,
+				caretText:getCaretText(cm,sel),selectionText:selectionText,
 				ranges:ranges, caretpos:r.start, caretposH:this.cor.stringify(r.start),
 				index:cm.indexFromPos(cursor),
 				cursor:cursor

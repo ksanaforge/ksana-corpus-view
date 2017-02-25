@@ -244,20 +244,17 @@ const CorpusView=React.createClass({
 		return this.kRangeFromSel(cm,from,to);
 	}
 	,onCut:function(cm,evt){
+		const krange=this.kRangeFromCursor(cm);
+		evt.target.value=this.cor.stringify(krange);
+		evt.target.select();//reselect the hidden textarea
+	}
+	,onCopy:function(cm,evt){
 		/*1p178a0103-15 copy and paste incorrect*/
 		/* TODO,  address error crossing a page, has line 30 */
 		const krange=this.kRangeFromCursor(cm);
-
 		if (this.props.copyText) { //for excerpt copy
-			if (evt.target.value.length<2) {
-				evt.target.value=this.cor.stringify(this.cor.parseRange(krange).start);
-			} else {
-				evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});				
-			}
+			evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});
 			evt.target.select();
-		} else { //default copy address
-			evt.target.value="@"+this.cor.stringify(krange)+';';
-			evt.target.select();//reselect the hidden textarea
 		}
 	}
 	,noSelection:function(cm){
@@ -328,6 +325,7 @@ const CorpusView=React.createClass({
 			text:this.state.text,
 			onCursorActivity:this.onCursorActivity,
 			onCut:this.onCut,
+			onCopy:this.onCopy,
 			onBlur:this.onBlur,
 			extraKeys:this.props.extraKeys,
 			onViewportChange:this.onViewportChange,
