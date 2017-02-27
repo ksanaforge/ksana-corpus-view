@@ -22,15 +22,14 @@ const CMView=React.createClass({
 	}
 	,jumpToRange:function(from,to,cb){
 		const cm=this.cm;
-		cm.scrollIntoView({line:cm.lineCount()-1,ch:0});
-		cm.setCursor(from);
+		cm.scrollIntoView({line:0,ch:0});
+		cm.setCursor(from,{scroll:true});
 		setTimeout(function(){
 			if (from.line<cm.lineCount()){
-				if (from.line>3) from.line-=3;
-				cm.scrollIntoView(from);
+				cm.scrollIntoView(from,200);
 			}
 			cb&&cb();
-		},300);//wait for decorator
+		},500);//wait for decorator
 	}
 	,scrollToText:function(t){
 		var text=this.cm.getValue();
