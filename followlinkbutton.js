@@ -7,10 +7,12 @@ yinshun@57p1262.1301 has two sources
 const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
-const {stringifyRange}=require("ksana-corpus");
+const stringifyRange=require("ksana-corpus").stringifyRange;
 const getLinkLabel=function(link,corpora){
 	var linklabel=link.to;
-	if (!corpora) return  linklabel;
+	if (!corpora) {
+		return linklabel;
+	}
 	const cor=corpora[link.corpus]; //not open yet
 	if (!cor) {
 		if (typeof linklabel=="number") {

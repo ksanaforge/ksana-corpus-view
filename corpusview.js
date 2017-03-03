@@ -7,6 +7,7 @@ const getArticleHits=require("ksana-corpus-search").getArticleHits;
 const decorate=require("./decorate").decorate;
 const decorateUserField=require("./decorate").decorateUserField;
 const decoratePageStarts=require("./decorate").decoratePageStarts;
+const USER_FIELD_PREFIX=require("./decorate").USER_FIELD_PREFIX;
 const decorateHits=require("./decorate").decorateHits;
 const selectionActivity=require("./selectionactivity");
 const followLinkButton=require("./followlinkbutton");
@@ -89,13 +90,12 @@ const CorpusView=React.createClass({
 	,loadtext:function(props){
 		props=props||this.props;
 
-		this.cor=this.props.cor?this.props.cor:openCorpus(props.corpus);
+		this.cor=props.cor?props.cor:openCorpus(props.corpus);
 		this.markinview={};//fast check if mark already render, assuming no duplicate mark in same range
 		this.markdone={};
-		this.props.removeAllUserLinks&&this.props.removeAllUserLinks(props.corpus);
+		props.removeAllUserLinks&&props.removeAllUserLinks(props.corpus);
 		this.setupDecoratorActions();
-
-		decorateUserField.call(this,{},this.props.userfield);//this will unpaint all fields
+		decorateUserField.call(this,{},props.userfield);//this will unpaint all fields
 
 		this.layout(props.article,props.rawlines,props.address,props.layout);
 	}
@@ -141,7 +141,7 @@ const CorpusView=React.createClass({
 		const newmarkinview={};
 		for (var id in this.markinview){
 			const type=id.match(/(.*?)_/)[1];
-			if (!fields[type]) {
+			if (!fields[type] && type[0]!==USER_FIELD_PREFIX) { //user field
 				this.markinview[id]&&this.markinview[id].clear();
 			} else {
 				newmarkinview[id]=this.markinview[id];
@@ -156,7 +156,14 @@ const CorpusView=React.createClass({
 			return;
 		}
 
+		if (nextProps.fields!==this.props.fields) {
+			this.removeDeleteFields(nextProps.fields);
+			this.onViewportChange();			
+		}
+
 		if (nextProps.userfield && nextProps.userfield !== this.props.userfield) { //user field should have id
+			
+//			if (Object.keys(nextProps.userfield).length)debugger
 			decorateUserField.call(this,nextProps.userfield,this.props.userfield);
 			//decorateUserField might clearWorking Link , call viewportchange to repaint
 			this.onViewportChange();
@@ -164,10 +171,6 @@ const CorpusView=React.createClass({
 			this.clearHitButtons();
 		}
 
-		if (nextProps.fields!==this.props.fields) {
-			this.removeDeleteFields(nextProps.fields);
-			this.onViewportChange();			
-		}
 		//if (this.cm && nextProps.active)this.cm.focus();
 
 		if (this.props.address!==nextProps.address ) { //need by updateArticleByAddress

@@ -1,6 +1,6 @@
 const clearWorkingLink=require("./link").clearWorkingLink;
 const makeMarkerId=require("./link").makeMarkerId;
-
+const USER_FIELD_PREFIX="#";
 
 //for field with same starting position,
 //the short one comes later, so that it will not be overwrite by longer span
@@ -25,7 +25,8 @@ const reOrderField=function(cor,pos,value){
 }
 const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields){
 		var i=0;
-		const {pos,value}=reOrderField(this.cor,_pos,_value);
+		const rr=reOrderField(this.cor,_pos,_value);
+		const pos=rr.pos,value=rr.value;
 		while (i<pos.length) {
 			const id=i;
 			const range=this.cor.parseRange(pos[i]);
@@ -55,8 +56,8 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 			if (this.cor.isRange(p)){
 				r=this.toLogicalRange(p);
 			} else {
-				rr=this.toLogicalPos(p);
-				r={start:rr,end:rr};
+				var r2=this.toLogicalPos(p);
+				r={start:r2,end:r2};
 			}
 
 			const markerid=makeMarkerId(fname,range);
@@ -68,6 +69,7 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 				fields:fields,
 				kpos:range.start,krange:range,tabid:this.props.id,id:id,target:target,
 				multitarget:multitarget,actions:this.actions,done:done});
+
 		}
 }
 
@@ -95,13 +97,14 @@ const groupByDecorator=function(pos,value){
 	return out;
 }
 
-const removeDeleted=function(fields, oldfields){
+const removeDeletedUserField=function(fields, oldfields){
 	for (var id in oldfields) {
 		const old=oldfields[id];
-		const markerid=makeMarkerId(old.decorator,old.range);
+		const markerid=USER_FIELD_PREFIX+makeMarkerId(old.decorator,old.range);
 		if (!fields[id]) {
 			const m=this.markinview[markerid];
 			if (m){
+				console.log("cler userfield")
 				m.clear();
 				delete this.markinview[markerid];
 				clearWorkingLink.call(this,id,false);
@@ -117,7 +120,7 @@ const getDecorator=function(fieldname) { //might suffix with @
 	return this.props.decorators[decoratorname];
 }
 const decorateUserField=function(_fields, oldfields){
-	removeDeleted.call(this,_fields,oldfields);
+	removeDeletedUserField.call(this,_fields,oldfields);
 	const ff=sortFields.call(this,_fields);
 	for (var _f in _fields) { //remove all worling link marker, force redraw
 		clearWorkingLink.call(this,_f,true);
@@ -129,7 +132,7 @@ const decorateUserField=function(_fields, oldfields){
 		const at=name.indexOf("@");
 		if (at>0) decoratorname=decoratorname.substr(0,at);
 		const decorator=getDecorator.call(this,name);;
-		decorator&&decorateField.call(this,name,fields[name].pos,fields[name].value,decorator);
+		decorator&&decorateField.call(this,USER_FIELD_PREFIX+name,fields[name].pos,fields[name].value,decorator);
 	}
 }
 
@@ -181,4 +184,4 @@ const decoratePageStarts=function(){
 	}
 }
 module.exports={decorate:decorate,decorateField:decorateField,decorateUserField:decorateUserField
-,decoratePageStarts:decoratePageStarts,decorateHits:decorateHits};
+,decoratePageStarts:decoratePageStarts,decorateHits:decorateHits,USER_FIELD_PREFIX:USER_FIELD_PREFIX};

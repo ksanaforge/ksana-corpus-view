@@ -1,4 +1,3 @@
-const openCorpus=require("ksana-corpus").openCorpus;
 const trimArticleField=require("ksana-corpus").trimArticleField;
 const bsearch=require("ksana-corpus/bsearch");
 
@@ -32,6 +31,7 @@ const hasLinkAt=function(cor,kpos,fields,corpora) {
 		const targetcorpus=name.replace(/.*@/,"");
 		if (targetcorpus==name) continue;
 		const targetcor=corpora[targetcorpus];
+		if (!targetcor)continue;
 		if (!cor.isRange(field.pos[0])) continue;
 
 		for (var i=0;i<field.pos.length;i++) {
