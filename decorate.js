@@ -104,7 +104,6 @@ const removeDeletedUserField=function(fields, oldfields){
 		if (!fields[id]) {
 			const m=this.markinview[markerid];
 			if (m){
-				console.log("cler userfield")
 				m.clear();
 				delete this.markinview[markerid];
 				clearWorkingLink.call(this,id,false);
