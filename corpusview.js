@@ -218,6 +218,9 @@ const CorpusView=React.createClass({
 		}
 	}
 	,layout:function(article,rawlines,address,playout){
+		if (!rawlines) {
+			return;
+		}
 		const cor=this.cor;
 		if (!address){ //scroll to the selection after layout
 			address=this.kRangeFromCursor(this.cm);

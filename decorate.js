@@ -10,7 +10,7 @@ const reOrderField=function(cor,pos,value){
 		arr.push([pos[i],value?value[i]:null]);
 	}
 	arr.sort(function(a,b){
-		const r1=cor.parseRange(a[0]);
+		const r1=cor.parseRange(a[0]); //parse range is slow , don't why?
 		const r2=cor.parseRange(b[0]);
 		if (r1.start!==r2.start) return r1.start-r2.start;//start has higher priority
 
@@ -24,53 +24,57 @@ const reOrderField=function(cor,pos,value){
 	return out;
 }
 const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields){
-		var i=0;
-		const rr=reOrderField(this.cor,_pos,_value);
-		const pos=rr.pos,value=rr.value;
-		while (i<pos.length) {
-			const id=i;
-			const range=this.cor.parseRange(pos[i]);
-			if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
-				if (range.start<fromkpos || range.end>tokpos) {
-					i++;
-					continue;
-				}
-			}
-
-			if (this.markinview[makeMarkerId(fname,range)]) {
-				i++
+	var i=0;
+	//const rr=reOrderField(this.cor,_pos,_value);
+	const rr={value:_value,pos:_pos};
+	const pos=rr.pos,value=rr.value;
+	var decorated=0;
+	while (i<pos.length) {
+		const id=i;
+		const range=this.cor.parseRange(pos[i]);
+		if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
+			if (range.start<fromkpos || range.end>tokpos) {
+				i++;
 				continue;
 			}
-
-			const p=pos[i],v=value?value[i]:"";
-			var target=v, multitarget=false;
-			i++;
-
-			while (i<pos.length && this.cor.parseRange(pos[i]).start==range.start) {
-				if (!multitarget) target=[target];
-				target.push(value?value[i]:i);
-				multitarget=true;
-				i++;
-			}
-			var r;
-			if (this.cor.isRange(p)){
-				r=this.toLogicalRange(p);
-			} else {
-				var r2=this.toLogicalPos(p);
-				r={start:r2,end:r2};
-			}
-
-			const markerid=makeMarkerId(fname,range);
-			const done=this.markdone[markerid];
-
-			this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,
-				corpus:this.props.corpus,
-				field:fname,
-				fields:fields,
-				kpos:range.start,krange:range,tabid:this.props.id,id:id,target:target,
-				multitarget:multitarget,actions:this.actions,done:done});
-
 		}
+
+		if (this.markinview[makeMarkerId(fname,range)]) {
+			i++
+			continue;
+		}
+
+		const p=pos[i],v=value?value[i]:"";
+		var target=v, multitarget=false;
+		i++;
+
+		while (i<pos.length && this.cor.parseRange(pos[i]).start==range.start) {
+			if (!multitarget) target=[target];
+			target.push(value?value[i]:i);
+			multitarget=true;
+			i++;
+		}
+		var r;
+		if (this.cor.isRange(p)){
+			r=this.toLogicalRange(p);
+		} else {
+			var r2=this.toLogicalPos(p);
+			r={start:r2,end:r2};
+		}
+
+		const markerid=makeMarkerId(fname,range);
+		const done=this.markdone[markerid];
+		decorated++;
+
+		this.markinview[markerid]=decorator({cm:this.cm,cor:this.cor,start:r.start,end:r.end,
+			corpus:this.props.corpus,
+			field:fname,
+			fields:fields,
+			kpos:range.start,krange:range,tabid:this.props.id,id:id,target:target,
+			multitarget:multitarget,actions:this.actions,done:done});
+
+	}
+	//console.log("decorated",decorated,fname)
 }
 
 const sortFields=function(fields){
