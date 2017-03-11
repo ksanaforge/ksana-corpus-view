@@ -7,7 +7,13 @@ yinshun@57p1262.1301 has two sources
 const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
-const stringifyRange=require("ksana-corpus").stringifyRange;
+var stringifyRange=null;
+try {
+	stringifyRange=require("ksana-corpus").stringifyRange;
+} catch(e){
+	stringifyRange=require("ksana-corpus-lib").stringifyRange;
+}
+
 const getLinkLabel=function(link,corpora){
 	var linklabel=link.to;
 	if (!corpora) {
@@ -19,7 +25,7 @@ const getLinkLabel=function(link,corpora){
 			const l=linklabel=stringifyRange(linklabel,link.corpus);
 			if (l) return l;
 		}
-		return link.corpus;
+		return (typeof link.to=="string")?link.to:link.corpus;
 	}
 
 	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to,true):"";

@@ -32,8 +32,10 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 	while (i<pos.length) {
 		const id=i;
 		const range=this.cor.parseRange(pos[i]);
+		
 		if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
-			if (range.start<fromkpos || range.end>tokpos) {
+			if (!((range.start>fromkpos && range.start<tokpos)
+			|| (range.end>fromkpos && range.end<tokpos) )){
 				i++;
 				continue;
 			}

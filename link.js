@@ -1,5 +1,12 @@
-const trimArticleField=require("ksana-corpus").trimArticleField;
-const bsearch=require("ksana-corpus/bsearch");
+var bsearch=null,trimArticleField=null,stringifyRange=null;
+try {
+	trimArticleField=require("ksana-corpus").trimArticleField;
+	bsearch=require("ksana-corpus").bsearch;
+} catch(e){
+	trimArticleField=require("ksana-corpus-lib").trimArticleField;
+	bsearch=require("ksana-corpus-lib").bsearch;
+}
+
 
 const	getWorkingLinks=function(workinglinks,prefix,article){
 	const fields=trimArticleField(workinglinks,article);
@@ -22,7 +29,7 @@ const makeMarkerId=function(prefix,rangeobj){
 		return prefix+"_"+rangeobj.range;
 	}
 }
-const hasLinkAt=function(cor,kpos,fields,corpora) {
+const hasLinkAt=function(cor,kpos,fields,corpora,stringifyRange) {
 	const out=[],targetcorpus="";
 	for (var name in fields) {
 		const field=fields[name];
@@ -30,16 +37,15 @@ const hasLinkAt=function(cor,kpos,fields,corpora) {
 
 		const targetcorpus=name.replace(/.*@/,"");
 		if (targetcorpus==name) continue;
-		const targetcor=corpora[targetcorpus];
-		if (!targetcor)continue;
 		if (!cor.isRange(field.pos[0])) continue;
 
 		for (var i=0;i<field.pos.length;i++) {
 			const r=cor.parseRange(field.pos[i]);
 			if (kpos>=r.start && kpos<=r.end) {
 				var to=field.value[i];
-				if (targetcor && typeof to=="number") {
-					to=targetcor.stringify(to);
+				if (typeof to=="number") {
+					const str_to=stringifyRange(to,targetcorpus);
+					if (str_to) to=str_to;
 				}
 				out.push({id:i,corpus:targetcorpus,from:field.pos[i],to:to});
 			}

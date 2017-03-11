@@ -2,8 +2,18 @@ const React=require("react");
 const E=React.createElement;
 const PT=React.PropTypes;
 const CMView=require("./cmview");
-const openCorpus=require("ksana-corpus").openCorpus;
-const getArticleHits=require("ksana-corpus-search").getArticleHits;
+
+var search=null,filterMatch=null,stringifyRange=null;
+try {
+	openCorpus=require("ksana-corpus").openCorpus;
+	getArticleHits=require("ksana-corpus-search").getArticleHits;
+	stringifyRange=require("ksana-corpus").stringifyRange;
+} catch(e){
+	openCorpus=require("ksana-corpus-lib").openCorpus;
+	getArticleHits=require("ksana-corpus-lib").getArticleHits;
+	stringifyRange=require("ksana-corpus-lib").stringifyRange;
+}
+
 const decorate=require("./decorate").decorate;
 const decorateUserField=require("./decorate").decorateUserField;
 const decoratePageStarts=require("./decorate").decoratePageStarts;
@@ -295,7 +305,7 @@ const CorpusView=React.createClass({
 				const userlinks=hasUserLinkAt(kpos,this.props.userfield);
 				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
 
-				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora);				
+				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
 				this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
 
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
@@ -311,7 +321,8 @@ const CorpusView=React.createClass({
 		this.viewporttimer=setTimeout(function(){
 			const vp=cm.getViewport();
 			const from=this.fromLogicalPos({line:vp.from,ch:0});
-			const to=this.fromLogicalPos({line:vp.to,ch:0});
+			var to=this.fromLogicalPos({line:vp.to,ch:0});
+			if (to<from) to=this.props.article.end;
 
 			decorate.call(this,from,to);
 			this.onViewport&&this.onViewport(cm,vp.from,vp.to,from,to); //extra params start and end kpos

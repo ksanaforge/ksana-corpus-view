@@ -3,7 +3,6 @@ const ReactDOM=require("react-dom");
 const E=React.createElement;
 const hasHitAt=require("./link").hasHitAt;
 const _=require("ksana-localization")._;
-const openCorpus=require("ksana-corpus").openCorpus;
 
 const HitButtons=React.createClass({
 	prev:function(){
