@@ -301,12 +301,12 @@ const CorpusView=React.createClass({
 			this.clearLinkButtons();
 			this.clearHitButtons();
 			this.clearHighlight();
-			if (this.noSelection(cm)) {
+			if (this.noSelection(cm)) {				
 				const userlinks=hasUserLinkAt(kpos,this.props.userfield);
-				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
+				this.userlinkbuttons=(this.props.followLinks||followLinkButton)(cm,userlinks,this.actions,this.props.corpora);
 
 				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
-				this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
+				this.multilinkbuttons=(this.props.followLinks||followLinkButton)(cm,multilinks,this.actions,this.props.corpora);
 
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
