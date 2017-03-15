@@ -66,11 +66,11 @@ const CorpusView=React.createClass({
 	}
 	,clearLinkButtons:function(){
 		if (this.userlinkbuttons) {
-			this.userlinkbuttons.clear();
+			this.userlinkbuttons.clear&&this.userlinkbuttons.clear();
 			this.userlinkbuttons=null;
 		}
 		if (this.multilinkbuttons) {
-			this.multilinkbuttons.clear();
+			this.multilinkbuttons.clear&&this.multilinkbuttons.clear();
 			this.multilinkbuttons=null;
 		}
 	}
@@ -113,7 +113,6 @@ const CorpusView=React.createClass({
 		getArticleHits({cor:this.cor,lines:this.state.lines,linebreaks:this.state.linebreaks,
 			article:this.props.article,
 			pagebreaks:this.state.pagebreaks,searchresult:this.props.searchresult},function(hits){
-
 				decorateHits.call(this,hits);
 
 				this.articleHits=hits;
@@ -171,8 +170,7 @@ const CorpusView=React.createClass({
 			this.onViewportChange();			
 		}
 
-		if (nextProps.userfield && nextProps.userfield !== this.props.userfield) { //user field should have id
-			
+		if (nextProps.userfield && nextProps.userfield !== this.props.userfield) { //user field should have id			
 //			if (Object.keys(nextProps.userfield).length)debugger
 			decorateUserField.call(this,nextProps.userfield,this.props.userfield);
 			//decorateUserField might clearWorking Link , call viewportchange to repaint
@@ -190,7 +188,9 @@ const CorpusView=React.createClass({
 			if (!this.inViewPort(r.start.line)) {
 				this.scrollToAddress(nextProps.address);
 			} else {
-				if (this.noSelection(this.cm)) this.cm.setCursor(r.start);
+				if (this.noSelection(this.cm)) {
+					this.cm.setCursor(r.start);
+				}
 			}
 		}
 	}	
@@ -201,8 +201,8 @@ const CorpusView=React.createClass({
 	,toLogicalRange:function(range){
 		return this.cor.toLogicalRange(this.state.linebreaks,range,this.getRawLine);
 	}
-	,toLogicalPos:function(kpos,beforepunc){
-		return this.cor.toLogicalPos(this.state.linebreaks,kpos,this.getRawLine,this.cor.meta.removePunc,beforepunc);
+	,toLogicalPos:function(kpos,tailing,skipleading){
+		return this.cor.toLogicalPos(this.state.linebreaks,kpos,this.getRawLine,tailing,skipleading);
 	}
 	,fromLogicalPos:function(linech){
 		if (!this.cor)return;
@@ -295,7 +295,8 @@ const CorpusView=React.createClass({
 		clearTimeout(this.cursortimer);
 		this.cursortimer=setTimeout(function(){
 			if (this._unmounted)return;
-			const kpos=this.fromLogicalPos(cm.getCursor());
+			const cursor=cm.getCursor();
+			const kpos=this.fromLogicalPos(cursor);
 			selectionActivity.call(this,cm);
 
 			this.clearLinkButtons();
@@ -307,6 +308,10 @@ const CorpusView=React.createClass({
 
 				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
 				this.multilinkbuttons=(this.props.followLinks||followLinkButton)(cm,multilinks,this.actions,this.props.corpora);
+				//custom buttons return false (too few links), use default 
+				if (!this.multilinkbuttons) {
+					this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
+				}
 
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
@@ -323,7 +328,6 @@ const CorpusView=React.createClass({
 			const from=this.fromLogicalPos({line:vp.from,ch:0});
 			var to=this.fromLogicalPos({line:vp.to,ch:0});
 			if (to<from) to=this.props.article.end;
-
 			decorate.call(this,from,to);
 			this.onViewport&&this.onViewport(cm,vp.from,vp.to,from,to); //extra params start and end kpos
 			this.addresschanged=true;

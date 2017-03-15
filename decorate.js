@@ -29,6 +29,7 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 	const rr={value:_value,pos:_pos};
 	const pos=rr.pos,value=rr.value;
 	var decorated=0;
+
 	while (i<pos.length) {
 		const id=i;
 		const range=this.cor.parseRange(pos[i]);
@@ -58,9 +59,12 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 		}
 		var r;
 		if (this.cor.isRange(p)){
+			//by default enclose the concrete words closely
 			r=this.toLogicalRange(p);
 		} else {
-			var r2=this.toLogicalPos(p);
+			//tailing = false to paint just after concrete char
+			//skipleading to true, so that number of footnotes will stay at begining of line
+			var r2=this.toLogicalPos(p,false,true);
 			r={start:r2,end:r2};
 		}
 
@@ -159,9 +163,11 @@ const decorateHits=function(phrasehits){
 
 	for (var i=0;i<phrasehits.length;i++) {
 		const hits=phrasehits[i].hits;
-		const lengths=phrasehits[i].lengths;
+		const hitsend=phrasehits[i].hitsend;
+
 		for (var j=0;j<hits.length;j++) {
-			const r=this.toLogicalRange(  this.cor.makeRange(hits[j],hits[j]+ (lengths[j]||lengths)));
+			const r=this.toLogicalRange(  this.cor.makeRange(hits[j],hitsend[j]));
+
 			const marker=this.cm.markText(r.start,r.end,{className:'hl'+i});
 			this._hits.push(marker);
 		}
