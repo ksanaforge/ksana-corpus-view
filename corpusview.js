@@ -304,7 +304,7 @@ const CorpusView=React.createClass({
 			this.clearHighlight();
 			if (this.noSelection(cm)) {				
 				const userlinks=hasUserLinkAt(kpos,this.props.userfield);
-				this.userlinkbuttons=(this.props.followLinks||followLinkButton)(cm,userlinks,this.actions,this.props.corpora);
+				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
 
 				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
 				this.multilinkbuttons=(this.props.followLinks||followLinkButton)(cm,multilinks,this.actions,this.props.corpora);

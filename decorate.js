@@ -34,7 +34,7 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 		const id=i;
 		const range=this.cor.parseRange(pos[i]);
 		
-		if (typeof fromkpos!==undefined && typeof tokpos !==undefined){
+		if (typeof fromkpos!=="undefined"&& typeof tokpos !=="undefined"){
 			if (!((range.start>fromkpos && range.start<tokpos)
 			|| (range.end>fromkpos && range.end<tokpos) )){
 				i++;
@@ -129,6 +129,7 @@ const getDecorator=function(fieldname) { //might suffix with @
 	return this.props.decorators[decoratorname];
 }
 const decorateUserField=function(_fields, oldfields){
+
 	removeDeletedUserField.call(this,_fields,oldfields);
 	const ff=sortFields.call(this,_fields);
 	for (var _f in _fields) { //remove all worling link marker, force redraw
