@@ -201,8 +201,8 @@ const CorpusView=React.createClass({
 	,toLogicalRange:function(range){
 		return this.cor.toLogicalRange(this.state.linebreaks,range,this.getRawLine);
 	}
-	,toLogicalPos:function(kpos,tailing,skipleading){
-		return this.cor.toLogicalPos(this.state.linebreaks,kpos,this.getRawLine,tailing,skipleading);
+	,toLogicalPos:function(kpos,tailing){
+		return this.cor.toLogicalPos(this.state.linebreaks,kpos,this.getRawLine,tailing);
 	}
 	,fromLogicalPos:function(linech){
 		if (!this.cor)return;
@@ -210,7 +210,7 @@ const CorpusView=React.createClass({
 		const text=this.cm.doc.getLine(linech.line);
 		const lb=this.state.linebreaks[linech.line];
 		if (typeof text==="undefined") return this.props.article.end;
-		return this.cor.fromLogicalPos(text,linech.ch,lb,firstline,this.getRawLine);
+		return this.cor.fromLogicalPos(text,linech,lb,firstline,this.getRawLine);
 	}
 	,getRawLine:function(line){
 		return this.props.rawlines[line];
@@ -244,8 +244,8 @@ const CorpusView=React.createClass({
 		if (!from||!to)return 0;
 		const f=this.cor.fromLogicalPos.bind(this.cor);
 		const firstline=this.cor.bookLineOf(this.props.article.start); //first of of the article
-		const s=f(cm.doc.getLine(from.line),from.ch,this.state.linebreaks[from.line],firstline,this.getRawLine,true);
-		const e=f(cm.doc.getLine(to.line),to.ch,this.state.linebreaks[to.line],firstline,this.getRawLine,true);
+		const s=f(cm.doc.getLine(from.line),from,this.state.linebreaks[from.line],firstline,this.getRawLine,true);
+		const e=f(cm.doc.getLine(to.line),to,this.state.linebreaks[to.line],firstline,this.getRawLine,true);
 		return this.cor.makeRange(s,e);
 	}
 	,kRangeFromCursor:function(cm){
@@ -290,6 +290,22 @@ const CorpusView=React.createClass({
 	,onBlur:function(cm){
 		this.dicthandle&&this.dicthandle.clear();
 	}
+	,autoFollow(linkbuttons){
+		const widget=linkbuttons&&linkbuttons.replacedWith;
+		if (widget){
+			var target=widget;
+			if (target.children.length==1) target=target.children[0];
+			const mouseover=widget.onmouseoever||widget.children[0].onmouseover;
+			const mousedown=widget.onmouseodown||widget.children[0].onmousedown;
+			if (!mouseover&&!mousedown) return;
+
+			setTimeout(function(){
+				mouseover&&mouseover({target});
+				mousedown&&mousedown({target});				
+				linkbuttons.clear();
+			},5);
+		}
+	}
 	,onCursorActivity:function(cm){
 		if (!this.cor) return;
 		clearTimeout(this.cursortimer);
@@ -307,12 +323,15 @@ const CorpusView=React.createClass({
 				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
 
 				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
+				
 				this.multilinkbuttons=(this.props.followLinks||followLinkButton)(cm,multilinks,this.actions,this.props.corpora);
 				//custom buttons return false (too few links), use default 
 				if (!this.multilinkbuttons) {
 					this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
 				}
-
+				if(this.props.autoFollowSingleLink){
+					this.autoFollow(this.multilinkbuttons);
+				}
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
 			//this.showDictHandle(cm);	

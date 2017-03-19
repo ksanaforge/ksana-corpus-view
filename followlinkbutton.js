@@ -41,7 +41,7 @@ const followLink=function(cm,links,actions,corpora){
 	if (!Object.keys(links).length) return;
 
 	const onMouseDown=function(e){
-		e.stopPropagation();
+		e.stopPropagation&&e.stopPropagation();
 		actions.openLink(e.target.target);
 	}
 

@@ -64,7 +64,7 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 		} else {
 			//tailing = false to paint just after concrete char
 			//skipleading to true, so that number of footnotes will stay at begining of line
-			var r2=this.toLogicalPos(p,false,true);
+			var r2=this.toLogicalPos(p,false);
 			r={start:r2,end:r2};
 		}
 
