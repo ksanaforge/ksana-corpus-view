@@ -47,7 +47,8 @@ const CorpusView=React.createClass({
 		showPageStart:PT.bool
 	}
 	,getInitialState:function(){
-		return {text:"",linebreaks:[],pagebreaks:[]};
+		const updateTime=new Date();
+		return {text:"",linebreaks:[],pagebreaks:[],updateTime};
 	}
 	,setupDecoratorActions:function(){
 		//prepare actions for decorators
@@ -237,7 +238,8 @@ const CorpusView=React.createClass({
 		}
 		const o=cor.layoutText(rawlines,article.start,playout)
 		const text=o.lines.join("\n");
-		this.setState({linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
+		const updateTime=new Date();
+		this.setState({updateTime,linebreaks:o.linebreaks,pagebreaks:o.pagebreaks,text:text,lines:o.lines}, this.textReady );
 	}
 	,kRangeFromSel:function(cm,from,to){
 		if (!this.cor)return;
@@ -323,13 +325,16 @@ const CorpusView=React.createClass({
 				this.userlinkbuttons=followLinkButton(cm,userlinks,this.actions,this.props.corpora);
 
 				const multilinks=hasLinkAt(this.cor,kpos,this.props.fields,this.props.corpora,stringifyRange);
-				
+
 				this.multilinkbuttons=(this.props.followLinks||followLinkButton)(cm,multilinks,this.actions,this.props.corpora);
 				//custom buttons return false (too few links), use default 
 				if (!this.multilinkbuttons) {
 					this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
 				}
-				if(this.props.autoFollowSingleLink){
+				const updateSince=new Date() - this.state.updateTime;
+
+				//prevent update from aux to trigger change to aux
+				if(this.props.autoFollowSingleLink && updateSince>1500){
 					this.autoFollow(this.multilinkbuttons);
 				}
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);

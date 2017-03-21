@@ -19,6 +19,7 @@ const getLinkLabel=function(link,corpora){
 	if (!corpora) {
 		return linklabel;
 	}
+
 	const cor=corpora[link.corpus]; //not open yet
 	if (!cor) {
 		if (typeof linklabel=="number") {
@@ -27,17 +28,16 @@ const getLinkLabel=function(link,corpora){
 		}
 		return (typeof link.to=="string")?link.to:link.corpus;
 	}
-
 	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to,true):"";
 	if (typeof linklabel=="number") {
-		linklabel=link.corpus+"@"+linklabel;
+		linklabel=link.corpus+"@"+cor.stringify(linklabel);
 	}
 	linklabel=linklabel.replace(/\..*/,"");//remove after page,make it shorter;
 	if (shortname) linklabel=shortname+"p"+linklabel.replace(/.+p/,"");
 	return linklabel;
 }
 const followLink=function(cm,links,actions,corpora){
-	
+	if (!links)return;
 	if (!Object.keys(links).length) return;
 
 	const onMouseDown=function(e){
@@ -46,8 +46,8 @@ const followLink=function(cm,links,actions,corpora){
 	}
 
 	const onMouseOver=function(e){
-		const link=links[e.target.id]
-		actions.highlightAddress(link.from);
+		const link=links[e.target.id];
+		if (link && link.from) actions.highlightAddress(link.from);
 	}
 
 	var widget=document.createElement("span");
@@ -60,7 +60,6 @@ const followLink=function(cm,links,actions,corpora){
 		child.className="followbutton"
 
 		const linklabel=getLinkLabel(links[id],corpora);
-
 		child.target=links[id].corpus+"@"+links[id].to;
 		child.innerHTML=linklabel;
 		child.id=id;

@@ -7,6 +7,7 @@ try {
 	bsearch=require("ksana-corpus-lib").bsearch;
 }
 
+const BILINKREGEX=/.*</;
 
 const	getWorkingLinks=function(workinglinks,prefix,article){
 	const fields=trimArticleField(workinglinks,article);
@@ -30,15 +31,19 @@ const makeMarkerId=function(prefix,rangeobj){
 	}
 }
 const hasLinkAt=function(cor,kpos,fields,corpora,stringifyRange) {
-	const out=[],targetcorpus="";
+	var out=[];
 	for (var name in fields) {
 		const field=fields[name];
-		if (!field)continue;
+		if (!field || !field.pos || !field.pos[0])continue;
+		if (name=="jpeg"||name=="png") return;
 
-		const targetcorpus=name.replace(/.*@/,"");
-		if (targetcorpus==name) continue;
 		if (!cor.isRange(field.pos[0])) continue;
 
+		var targetcorpus=name.replace(BILINKREGEX,"");
+		if (targetcorpus==name) targetcorpus=cor.id;
+
+		//cannot have valid target in field.value
+		if (name=="rend" || name=="head")continue;
 		for (var i=0;i<field.pos.length;i++) {
 			const r=cor.parseRange(field.pos[i]);
 			if (kpos>=r.start && kpos<=r.end) {

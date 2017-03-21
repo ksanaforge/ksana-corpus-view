@@ -28,8 +28,8 @@ const decorateField=function(fname,_pos,_value,decorator,fromkpos,tokpos,fields)
 	//const rr=reOrderField(this.cor,_pos,_value);
 	const rr={value:_value,pos:_pos};
 	const pos=rr.pos,value=rr.value;
+	if (!pos)return;
 	var decorated=0;
-
 	while (i<pos.length) {
 		const id=i;
 		const range=this.cor.parseRange(pos[i]);
@@ -121,9 +121,9 @@ const removeDeletedUserField=function(fields, oldfields){
 		}
 	}
 }
-const getDecorator=function(fieldname) { //might suffix with @
+const getDecorator=function(fieldname) {
 	var decoratorname=fieldname;
-	const at=fieldname.indexOf("@");
+	const at=fieldname.indexOf("<");
 	if (at>0) decoratorname=decoratorname.substr(0,at);
 
 	return this.props.decorators[decoratorname];
