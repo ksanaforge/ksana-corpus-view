@@ -8,10 +8,10 @@ const React=require("react");
 const ReactDOM=require("react-dom");
 const E=React.createElement;
 var stringifyRange=null;
-try {
+if (typeof KsanaCorpus!=="undefined") {
+	stringifyRange=KsanaCorpus.stringifyRange;
+} else {
 	stringifyRange=require("ksana-corpus").stringifyRange;
-} catch(e){
-	stringifyRange=require("ksana-corpus-lib").stringifyRange;
 }
 
 const getLinkLabel=function(link,corpora){

@@ -1,11 +1,13 @@
-var bsearch=null,trimArticleField=null,stringifyRange=null;
-try {
+var bsearch=null,trimArticleField=null
+
+if (typeof KsanaCorpus!=="undefined") {
+	trimArticleField=KsanaCorpus.trimArticleField;
+	bsearch=KsanaCorpus.bsearch;
+} else {
 	trimArticleField=require("ksana-corpus").trimArticleField;
 	bsearch=require("ksana-corpus").bsearch;
-} catch(e){
-	trimArticleField=require("ksana-corpus-lib").trimArticleField;
-	bsearch=require("ksana-corpus-lib").bsearch;
 }
+
 
 const BILINKREGEX=/.*</;
 
@@ -48,6 +50,8 @@ const hasLinkAt=function(cor,kpos,fields,corpora,stringifyRange) {
 			const r=cor.parseRange(field.pos[i]);
 			if (kpos>=r.start && kpos<=r.end) {
 				var to=field.value[i];
+				if (to&&to[0]=="<") continue;
+				if (to&&to.length>100) continue;
 				if (typeof to=="number") {
 					const str_to=stringifyRange(to,targetcorpus);
 					if (str_to) to=str_to;

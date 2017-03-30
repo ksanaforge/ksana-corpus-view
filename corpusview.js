@@ -3,15 +3,15 @@ const E=React.createElement;
 const PT=React.PropTypes;
 const CMView=require("./cmview");
 
-var search=null,filterMatch=null,stringifyRange=null;
-try {
+var search,getArticleHits,stringifyRange;
+if (typeof KsanaCorpus!=="undefined") {
+	search=KsanaCorpus.openCorpus;
+	getArticleHits=KsanaCorpusSearch.getArticleHits;
+	stringifyRange=KsanaCorpus.stringifyRange;
+} else {
 	openCorpus=require("ksana-corpus").openCorpus;
 	getArticleHits=require("ksana-corpus-search").getArticleHits;
 	stringifyRange=require("ksana-corpus").stringifyRange;
-} catch(e){
-	openCorpus=require("ksana-corpus-lib").openCorpus;
-	getArticleHits=require("ksana-corpus-lib").getArticleHits;
-	stringifyRange=require("ksana-corpus-lib").stringifyRange;
 }
 
 const decorate=require("./decorate").decorate;
