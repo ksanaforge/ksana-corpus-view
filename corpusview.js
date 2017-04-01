@@ -9,9 +9,11 @@ if (typeof KsanaCorpus!=="undefined") {
 	getArticleHits=KsanaCorpusSearch.getArticleHits;
 	stringifyRange=KsanaCorpus.stringifyRange;
 } else {
-	openCorpus=require("ksana-corpus").openCorpus;
-	getArticleHits=require("ksana-corpus-search").getArticleHits;
-	stringifyRange=require("ksana-corpus").stringifyRange;
+	const KSANACORPUSSEARCH="ksana-corpus-search";
+	const KSANACORPUS="ksana-corpus";
+	openCorpus=require(KSANACORPUS).openCorpus;
+	getArticleHits=require(KSANACORPUSSEARCH).getArticleHits;
+	stringifyRange=require(KSANACORPUS).stringifyRange;
 }
 
 const decorate=require("./decorate").decorate;

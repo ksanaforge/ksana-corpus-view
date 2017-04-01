@@ -11,7 +11,8 @@ var stringifyRange=null;
 if (typeof KsanaCorpus!=="undefined") {
 	stringifyRange=KsanaCorpus.stringifyRange;
 } else {
-	stringifyRange=require("ksana-corpus").stringifyRange;
+	const KSANACORPUS="ksana-corpus"
+	stringifyRange=require(KSANACORPUS).stringifyRange;
 }
 
 const getLinkLabel=function(link,corpora){

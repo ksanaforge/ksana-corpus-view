@@ -4,8 +4,9 @@ if (typeof KsanaCorpus!=="undefined") {
 	trimArticleField=KsanaCorpus.trimArticleField;
 	bsearch=KsanaCorpus.bsearch;
 } else {
-	trimArticleField=require("ksana-corpus").trimArticleField;
-	bsearch=require("ksana-corpus").bsearch;
+	const KSANACORPUS="ksana-corpus";
+	trimArticleField=require(KSANACORPUS).trimArticleField;
+	bsearch=require(KSANACORPUS).bsearch;
 }
 
 
