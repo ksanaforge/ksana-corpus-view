@@ -273,7 +273,8 @@ const CorpusView=React.createClass({
 		/* TODO,  address error crossing a page, has line 30 */
 		const krange=this.kRangeFromCursor(cm);
 		if (this.props.copyText) { //for excerpt copy
-			evt.target.value=this.props.copyText({cm:cm,value:evt.target.value,krange:krange,cor:this.cor});
+			evt.target.value=this.props.copyText(
+				{cm:cm,value:evt.target.value,krange:krange,cor:this.cor,fields:this.props.fields});
 			evt.target.select();
 		}
 	}
