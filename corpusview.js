@@ -2,6 +2,7 @@ const React=require("react");
 const E=React.createElement;
 const PT=React.PropTypes;
 const CMView=require("./cmview");
+const is_iOS = navigator.userAgent.match(/(iphone|ipod|ipad)/i) != null;
 
 var search,getArticleHits,stringifyRange;
 if (typeof KsanaCorpus!=="undefined") {
@@ -314,6 +315,7 @@ const CorpusView=React.createClass({
 	,onCursorActivity:function(cm){
 		if (!this.cor) return;
 		clearTimeout(this.cursortimer);
+		if (is_iOS) document.activeElement.blur();
 		this.cursortimer=setTimeout(function(){
 			if (this._unmounted)return;
 			const cursor=cm.getCursor();
@@ -335,7 +337,6 @@ const CorpusView=React.createClass({
 					this.multilinkbuttons=followLinkButton(cm,multilinks,this.actions,this.props.corpora);
 				}
 				const updateSince=new Date() - this.state.updateTime;
-
 				//prevent update from aux to trigger change to aux
 				if(this.props.autoFollowSingleLink && updateSince>1500){
 					this.autoFollow(this.multilinkbuttons);
@@ -343,7 +344,9 @@ const CorpusView=React.createClass({
 				this.hitbuttons=hitButton(cm,kpos,this.articleHits,this.actions);
 			}
 			//this.showDictHandle(cm);	
+			if (is_iOS) document.activeElement.blur();
 			this.props.onCursorActivity&&this.props.onCursorActivity(cm,kpos);
+			if (is_iOS) document.activeElement.blur();
 		}.bind(this),300);
 	}
 	,onViewportChange:function(cm,from,to){
