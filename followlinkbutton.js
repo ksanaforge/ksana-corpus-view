@@ -29,7 +29,7 @@ const getLinkLabel=function(link,corpora){
 		}
 		return (typeof link.to=="string")?link.to:link.corpus;
 	}
-	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to,true):"";
+	const shortname=typeof (link.to!=="number")?cor.getGroupName(link.to):"";
 	if (typeof linklabel=="number") {
 		linklabel=link.corpus+"@"+cor.stringify(linklabel);
 	}
