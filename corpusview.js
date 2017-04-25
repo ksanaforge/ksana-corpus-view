@@ -127,8 +127,9 @@ const CorpusView=React.createClass({
 						decoratePageStarts.call(this);
 					}.bind(this),10);
 				}
-				this.scrollToAddress(this.props.address);
-
+				setTimeout(function(){
+					this.scrollToAddress(this.props.address);
+				}.bind(this),200);
 		}.bind(this));
 	}
 	,componentWillUnmount:function(){
@@ -155,7 +156,13 @@ const CorpusView=React.createClass({
 		for (var id in this.markinview){
 			const type=id.match(/(.*?)_/)[1];
 			if (!fields[type] && type[0]!==USER_FIELD_PREFIX) { //user field
-				this.markinview[id]&&this.markinview[id].clear();
+				const miv=this.markinview[id];
+				if (!miv) continue;
+				if (miv instanceof Array) {
+					miv.forEach(function(m){m.clear()});
+				} else {
+					miv.clear();
+				}
 			} else {
 				newmarkinview[id]=this.markinview[id];
 			}

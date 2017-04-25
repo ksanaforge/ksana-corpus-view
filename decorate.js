@@ -189,7 +189,6 @@ const decoratePageStarts=function(){
 		label.className="pblabel"
 
 		label.innerHTML=this.cor.stringify(pb).match(regexpb)[1];
-
 		ele.appendChild(label);
 		ele.className="pb";
 		this._pageStarts.push(this.cm.doc.addLineWidget(linech.start.line, ele,{above:true}));
