@@ -95,9 +95,6 @@ const CorpusView=React.createClass({
 		this.clearHighlight();
 		this.highlighmarker=this.cm.markText(start,end,{className:"highlight",clearOnEnter:true});
 	}
-	,componentDidUpdate(){
-		this.scrollToAddress(this.props.address);
-	}
 	,componentDidMount:function(){
 		if (!this.props.corpus && !this.props.cor) {
 			if(this.props.text) this.setState({text:this.props.text.join("\n")});
