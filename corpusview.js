@@ -94,6 +94,9 @@ const CorpusView=React.createClass({
 		this.clearHighlight();
 		this.highlighmarker=this.cm.markText(start,end,{className:"highlight",clearOnEnter:true});
 	}
+	,componentDidUpdate(){
+		this.scrollToAddress(this.props.address);
+	}
 	,componentDidMount:function(){
 		if (!this.props.corpus && !this.props.cor) {
 			if(this.props.text) this.setState({text:this.props.text.join("\n")});
@@ -227,6 +230,7 @@ const CorpusView=React.createClass({
 		return this.props.rawlines[line];
 	}
 	,scrollToAddress:function(address){
+		if (!this.cor)return;
 		const r=this.cor.toLogicalRange(this.state.linebreaks,address,this.getRawLine);
 		if (!r || r.start.line<0)return;
 		if (this.viewer) {
