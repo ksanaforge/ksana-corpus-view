@@ -91,6 +91,7 @@ const CorpusView=React.createClass({
 		}
 	}
 	,highlight:function(start,end){
+		if (!this.cm)return;
 		this.clearHighlight();
 		this.highlighmarker=this.cm.markText(start,end,{className:"highlight",clearOnEnter:true});
 	}
@@ -206,6 +207,10 @@ const CorpusView=React.createClass({
 					this.cm.setCursor(r.start);
 				}
 			}
+		}
+		if (this.props.hlAddress!==nextProps.hlAddress
+			&&nextProps.hlAddress) {
+			this.highlightAddress(nextProps.hlAddress);
 		}
 	}	
 	,clearSelection:function(){
@@ -331,7 +336,7 @@ const CorpusView=React.createClass({
 			if (this._unmounted)return;
 			const cursor=cm.getCursor();
 			const kpos=this.fromLogicalPos(cursor);
-			selectionActivity.call(this,cm);
+			selectionActivity.call(this,cm,this.cor,this.fromLogicalPos);
 
 			this.clearLinkButtons();
 			this.clearHitButtons();
