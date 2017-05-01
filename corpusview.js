@@ -125,7 +125,7 @@ const CorpusView=React.createClass({
 
 				if (this.props.showPageStart) {
 					setTimeout(function(){
-						decoratePageStarts.call(this);
+						decoratePageStarts.call(this,this.props.layout);
 					}.bind(this),10);
 				}
 				setTimeout(function(){

@@ -174,7 +174,7 @@ const decorateHits=function(phrasehits){
 		}
 	}
 }
-const decoratePageStarts=function(){
+const decoratePageStarts=function(layout){
 	if (!this._pageStarts) this._pageStarts=[];
 	else {
 		this._pageStarts.forEach(function(pagestart){pagestart.clear()});
@@ -182,16 +182,26 @@ const decoratePageStarts=function(){
 	}
 	const regexpb=/p(\d+[a-z]?)/;
 	for (var i=0;i<this.state.pagebreaks.length;i++) {
+
 		const pb=this.state.pagebreaks[i];
 		const linech=this.toLogicalRange(pb);
-		const ele=document.createElement("div");
-		const label=document.createElement("span");
-		label.className="pblabel"
+		const pbtext=this.cor.stringify(pb).match(regexpb)[1];
+		if (layout) {
+			const widget=document.createElement("span");
+			widget.innerHTML=pbtext;
+			widget.className="inlinepb";
+			this._pageStarts.push(this.cm.setBookmark(linech.start,{widget}));
+		} else {
+			const ele=document.createElement("div");
+			const label=document.createElement("span");
+			label.className="pblabel";
 
-		label.innerHTML=this.cor.stringify(pb).match(regexpb)[1];
-		ele.appendChild(label);
-		ele.className="pb";
-		this._pageStarts.push(this.cm.doc.addLineWidget(linech.start.line, ele,{above:true}));
+			label.innerHTML=pbtext;
+			ele.appendChild(label);
+			ele.className="pb";
+
+			this._pageStarts.push(this.cm.addLineWidget(linech.start.line, ele,{above:true}));
+		}
 	}
 }
 module.exports={decorate:decorate,decorateField:decorateField,decorateUserField:decorateUserField
